@@ -113,17 +113,11 @@
 
     /* -------------------------------------------------- */
     /* FIX iOS SAFARI: Scroll qua window để thanh trình duyệt tự thu nhỏ */
-    /* Safari/Chrome iOS chỉ ẩn thanh URL khi scroll là window scroll,  */
-    /* KHÔNG ẩn khi scroll trong div con. Giải pháp: trên mobile < 720px */
-    /* ta bỏ overflow:hidden của các container, để window tự scroll.     */
     /* -------------------------------------------------- */
     @media (max-width: 720px) {
         html {
-            /* Bắt buộc để iOS Safari nhận scroll event đúng cách */
             height: -webkit-fill-available;
         }
-        /* .main-body và .col-main-feed không được overflow:hidden nữa */
-        /* Thay vào đó để nội dung chảy tự nhiên và window scroll      */
         .main-body {
             height: auto !important;
             overflow: visible !important;
@@ -134,12 +128,10 @@
             min-height: 50vh;
             overflow-y: visible !important;
             overflow: visible !important;
-            /* padding-bottom để nội dung không bị che bởi header cố định */
             padding-bottom: 40px !important;
         }
         body {
             overflow-y: auto !important;
-            /* Trick: cho phép Safari thu nhỏ thanh URL */
             height: 100%;
         }
     }
@@ -264,7 +256,6 @@
     }
 
     async function loadModule(placeholderId, type, folder) {
-        // ĐÃ SỬA ĐỊA CHỈ: Thêm baseUrl của Laravel vào để gọi đúng route tuyệt đối
         const baseUrl = "{{ url('/') }}";
         let path = folder === 'profile' ? `${baseUrl}/src/modules/feed/profile/profile.blade.php` :
                    (type === 'feed' && ['home', 'favorite', 'explore', 'mixed'].includes(folder)) ? `${baseUrl}/src/modules/feed/feed-controller/feed-controller.blade.php` :
@@ -306,28 +297,43 @@
         const scrollContainer = document.querySelector('.col-main-feed');
         let lastScrollTop = 0;
 
-        let lastIsMobile = window.innerWidth <= 720;
+        // BẮT ĐẦU ĐOẠN JS ĐÃ SỬA LỖI RESIZE LIỆT NÚT
+        let lastWidth = window.innerWidth;
         window.addEventListener('resize', () => {
-            const isMobile = window.innerWidth <= 720;
-            if (lastIsMobile && !isMobile) {
+            const currentWidth = window.innerWidth;
+
+            // 1. Phục hồi thanh menu ngang khi phóng to từ Mobile lên PC/iPad
+            if (lastWidth <= 720 && currentWidth > 720) {
                 if (document.querySelector('.mobile-widget-row')) document.querySelector('.mobile-widget-row').style.display = '';
                 if (document.querySelector('.main-nav')) document.querySelector('.main-nav').style.display = '';
             }
-            lastIsMobile = isMobile;
-        });
 
-        // Hàm xử lý scroll chung cho cả div và window
+            // 2. Tự động ẩn sidebars khi thu nhỏ màn hình xuống < 1250px để tránh đè nút
+            if (lastWidth > 1250 && currentWidth <= 1250) {
+                if (!document.body.classList.contains('sidebars-hidden')) {
+                    document.body.classList.add('sidebars-hidden');
+                    rotateToggleIcons();
+                }
+            } else if (lastWidth <= 1250 && currentWidth > 1250) {
+                if (document.body.classList.contains('sidebars-hidden')) {
+                    document.body.classList.remove('sidebars-hidden');
+                    rotateToggleIcons();
+                }
+            }
+
+            lastWidth = currentWidth;
+        });
+        // KẾT THÚC ĐOẠN JS ĐÃ SỬA
+
         function handleScroll(scrollTop) {
             if (window.innerWidth >= 1250) return;
 
             if (window.innerWidth >= 720) {
-                // iPad: ẩn header/footer khi scroll xuống
                 const hide = scrollTop > lastScrollTop && scrollTop > 50;
                 header.classList.toggle('header-hidden', hide);
                 footer.classList.toggle('footer-hidden', hide);
                 document.body.classList.toggle('bars-hidden', hide);
             } else {
-                // Mobile: chỉ đóng sidebar khi scroll
                 if (Math.abs(scrollTop - lastScrollTop) > 2 && !document.body.classList.contains('sidebars-hidden')) {
                     document.body.classList.add('sidebars-hidden');
                     rotateToggleIcons();
@@ -337,9 +343,8 @@
         }
 
         if (scrollContainer) {
-            // Scroll trong div (iPad / PC nhỏ)
             scrollContainer.addEventListener('scroll', () => {
-                if (window.innerWidth <= 720) return; // Mobile dùng window scroll
+                if (window.innerWidth <= 720) return; 
                 handleScroll(scrollContainer.scrollTop);
             }, { passive: true });
 
@@ -351,9 +356,8 @@
             });
         }
 
-        // ===== MOBILE: Dùng window scroll để iOS Safari tự thu nhỏ thanh URL =====
         window.addEventListener('scroll', () => {
-            if (window.innerWidth > 720) return; // Chỉ cho mobile
+            if (window.innerWidth > 720) return; 
             handleScroll(window.scrollY || window.pageYOffset);
         }, { passive: true });
 
@@ -440,7 +444,6 @@
     }
 
     window.onload = () => {
-        // ĐÃ SỬA ĐỊA CHỈ: Thêm baseUrl vào đường dẫn gọi file tĩnh
         const baseUrl = "{{ url('/') }}";
         document.body.classList.add('widget-only-hidden');
         if (window.innerWidth < 1250) document.body.classList.add('sidebars-hidden'); else rotateToggleIcons();
