@@ -1,0 +1,164 @@
+/* src/components/widgets/right-widget.css */
+
+.widgets-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* THIẾT KẾ CARD THÔNG BÁO */
+.notification-widget {
+    background-color: #1e1f22; /* Màu đen Discord */
+    color: #ffffff;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.widget-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 13px;
+    color: #b5bac1;
+}
+
+.tab-item {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.tab-item.active {
+    color: #5865f2; /* Xanh Discord */
+    font-weight: 600;
+}
+
+.tab-item:hover {
+    color: #ffffff;
+}
+
+.section-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #949ba4;
+    margin-bottom: 15px;
+}
+
+.section-label a {
+    color: #00a8fc;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* NOTI ITEM STYLES */
+.noti-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-bottom: 5px;
+    position: relative;
+}
+
+.noti-item:hover {
+    background-color: #2b2d31;
+}
+
+.noti-avatar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.noti-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+/* Các Icon loại thông báo nhỏ ở góc avatar */
+.noti-type-icon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    border: 2px solid #1e1f22;
+    color: white;
+}
+
+.noti-type-icon.blue { background-color: #5865f2; }
+.noti-type-icon.green { background-color: #23a559; }
+.noti-type-icon.purple { background-color: #9b59b6; }
+.noti-type-icon.red { background-color: #f04747; }
+
+.noti-text {
+    flex: 1;
+}
+
+.noti-text p {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #dbdee1;
+}
+
+.noti-text p strong {
+    color: #ffffff;
+}
+
+.noti-text .time {
+    font-size: 11px;
+    color: #949ba4;
+    margin-top: 4px;
+    display: block;
+}
+
+/* Chấm xanh thông báo chưa đọc */
+.unread-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #00a8fc;
+    border-radius: 50%;
+    align-self: center;
+}
+
+/* Nút bấm phía dưới */
+.btn-show-more {
+    width: 100%;
+    padding: 12px;
+    margin-top: 15px;
+    background-color: #313338;
+    border: none;
+    border-radius: 8px;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-show-more:hover {
+    background-color: #404249;
+}

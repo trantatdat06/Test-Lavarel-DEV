@@ -1,0 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+:root {
+    --primary-color: #003366; 
+    --secondary-color: #005b96; 
+    --text-color: #333;
+    --bg-gray: #f4f7f6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    background: var(--bg-gray);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+h1 { font-weight: bold; margin: 0; color: var(--primary-color); font-size: 28px; }
+
+.subtitle {
+    font-size: 14px;
+    font-weight: 400;
+    margin: 15px 0 25px;
+    color: #666;
+}
+
+/* ================= NÚT BẤM ================= */
+button {
+    border-radius: 25px;
+    border: 1px solid var(--primary-color);
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 12px 45px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+button:active { transform: scale(0.95); }
+button.btn-submit { box-shadow: 0 4px 15px rgba(0, 51, 102, 0.2); }
+button.btn-submit:hover { box-shadow: 0 6px 20px rgba(0, 51, 102, 0.4); transform: translateY(-2px); }
+button.ghost { background-color: transparent; border-color: #FFFFFF; }
+
+.btn-back {
+    position: fixed; top: 25px; left: 25px; width: 40px; height: 40px;
+    background-color: #fff; color: var(--primary-color); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    text-decoration: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    z-index: 1000; transition: 0.3s;
+}
+
+/* ================= INPUT ================= */
+.input-group { position: relative; width: 100%; margin: 8px 0; }
+.input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #aaa; }
+.input-group input {
+    background-color: #f0f4f8; border: none; padding: 14px 15px 14px 45px; 
+    width: 100%; border-radius: 10px; outline: none; font-family: inherit;
+}
+
+/* ================= CONTAINER ================= */
+.container {
+    background-color: #fff; border-radius: 20px;
+    box-shadow: 0 14px 28px rgba(0,0,0,0.1), 0 10px 10px rgba(0,0,0,0.1);
+    position: relative; overflow: hidden; width: 850px; max-width: 95%; min-height: 580px; 
+}
+
+.form-container { position: absolute; top: 0; height: 100%; transition: all 0.6s ease-in-out; }
+form { background-color: #FFFFFF; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 0 50px; height: 100%; text-align: center; }
+
+/* PC Sliding Logic */
+.sign-in-container { left: 0; width: 50%; z-index: 2; }
+.sign-up-container { left: 0; width: 50%; opacity: 0; z-index: 1; }
+
+.container.right-panel-active .sign-in-container { transform: translateX(100%); }
+.container.right-panel-active .sign-up-container { transform: translateX(100%); opacity: 1; z-index: 5; }
+
+/* OVERLAY (PC) */
+.overlay-container { position: absolute; top: 0; left: 50%; width: 50%; height: 100%; overflow: hidden; transition: transform 0.6s ease-in-out; z-index: 100; }
+.container.right-panel-active .overlay-container { transform: translateX(-100%); }
+.overlay {
+    background: linear-gradient(to right, var(--secondary-color), var(--primary-color));
+    color: #FFFFFF; position: relative; left: -100%; height: 100%; width: 200%; transform: translateX(0); transition: transform 0.6s ease-in-out;
+}
+.container.right-panel-active .overlay { transform: translateX(50%); }
+.overlay-panel { position: absolute; display: flex; align-items: center; justify-content: center; flex-direction: column; padding: 0 40px; text-align: center; top: 0; height: 100%; width: 50%; transition: transform 0.6s ease-in-out; }
+.overlay-panel h1 { color: #fff; }
+.overlay-left { transform: translateX(-20%); }
+.container.right-panel-active .overlay-left { transform: translateX(0); }
+.overlay-right { right: 0; transform: translateX(0); }
+.container.right-panel-active .overlay-right { transform: translateX(20%); }
+
+/* MẬT KHẨU */
+.password-criteria { list-style: none; padding: 0; margin: 10px 0; text-align: left; width: 100%; }
+.password-criteria li { font-size: 12px; color: #e74c3c; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+.password-criteria li.valid { color: #2ecc71; }
+
+.mobile-switch { display: none; }
+
+/* ================= RESPONSIVE (MOBILE) ================= */
+@media (max-width: 768px) {
+    .container { width: 100%; max-width: 400px; min-height: 650px; border-radius: 15px; margin: 20px auto; }
+    .overlay-container { display: none; }
+    
+    .form-container { width: 100%; }
+    
+    /* Hiệu ứng trượt cho Mobile */
+    .sign-in-container { left: 0; opacity: 1; z-index: 2; }
+    .sign-up-container { left: 100%; opacity: 1; z-index: 2; } /* Đặt ở bên phải ngoài màn hình */
+
+    .container.right-panel-active .sign-in-container { transform: translateX(-100%); opacity: 0; }
+    .container.right-panel-active .sign-up-container { transform: translateX(-100%); opacity: 1; }
+
+    form { padding: 0 30px; }
+    h1 { font-size: 24px; }
+    
+    .mobile-switch { display: block; margin-top: 25px; font-size: 14px; color: #666; }
+    .mobile-switch span { color: var(--secondary-color); font-weight: bold; text-decoration: underline; cursor: pointer; }
+    
+    .btn-back { top: 15px; left: 15px; width: 35px; height: 35px; }
+}

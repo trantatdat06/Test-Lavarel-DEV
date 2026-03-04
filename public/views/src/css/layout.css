@@ -1,0 +1,36 @@
+/* src/css/layout.css */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body { font-family: 'Montserrat', sans-serif; height: 100vh; overflow: hidden; }
+
+.app-shell { display: flex; flex-direction: column; height: 100vh; width: 100vw; }
+
+.global-header { height: 65px; width: 100%; background-color: #ffffff; border-bottom: 1px solid #f0f0f0; z-index: 1000; }
+
+.main-body { 
+    flex: 1; display: flex; overflow: hidden; background-color: #f4f5f7; 
+    background-image: radial-gradient(circle at 50% 50%, rgba(115, 66, 225, 0.25) 0%, rgba(244, 245, 247, 1) 65%); 
+}
+
+/* 4 CỘT CHUẨN CỦA BODY */
+.col-1 { width: 72px; flex-shrink: 0; background-color: #0f0f11; z-index: 100; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+.col-main-feed { flex: 1; overflow-y: auto; padding: 20px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+.col-widget { width: 360px; flex-shrink: 0; overflow-y: auto; background: #fff; border-left: 1px solid #f0f0f0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow-x: hidden; }
+.col-tools { width: 60px; flex-shrink: 0; background-color: #ffffff; border-left: 1px solid #eaeaea; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); overflow: hidden; }
+
+/* TRẠNG THÁI ẨN */
+body.sidebars-hidden .col-1,
+body.sidebars-hidden .col-widget,
+body.sidebars-hidden .col-tools {
+    width: 0 !important;
+    border-left: none;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translate3d(0, 30px, 0); }
+    to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.animate-fade-in-up { animation: fadeInUp 0.5s ease-out forwards; }

@@ -1,0 +1,52 @@
+/* ================================================== */
+/* COMPONENT 1: BỘ LỌC FEED (FEED FILTERS)            */
+/* ================================================== */
+.feed-filters { display: flex; align-items: center; gap: 10px; overflow-x: auto; padding: 4px 0; margin-bottom: 20px; }
+.feed-filters::-webkit-scrollbar { display: none; }
+.filter-label { font-weight: 700; color: #1c1e21; font-size: 14px; margin-right: 5px; white-space: nowrap; }
+.filter-pill { padding: 6px 16px; background: #fff; border: 1px solid #dbdbdb; color: #1c1e21; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+.filter-pill:hover { background: #f0f2f5; }
+.filter-pill.active { background: #1877f2; color: #fff; border-color: #1877f2; }
+
+/* ================================================== */
+/* COMPONENT 2: NÚT TẠO BÀI VIẾT (POST COMPOSER TRAY) */
+/* ================================================== */
+.post-composer { background: #fff; border-radius: 16px; padding: 16px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; gap: 15px; align-items: center; margin-bottom: 20px; cursor: pointer; transition: 0.2s; }
+.post-composer:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+.post-composer img { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+.post-composer input { flex: 1; background: #f0f2f5; border: none; padding: 12px 20px; border-radius: 20px; font-size: 14px; outline: none; cursor: pointer; pointer-events: none; }
+
+/* ================================================== */
+/* COMPONENT 3: POPUP TẠO BÀI VIẾT (MODAL GIAO DIỆN)  */
+/* ================================================== */
+.create-post-modal {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(5px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999999 !important; opacity: 0; visibility: hidden; transition: all 0.3s;
+}
+.create-post-modal.active { opacity: 1; visibility: visible; }
+.create-post-content {
+    background: #fff; border-radius: 16px; width: 500px; max-width: 90%;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2); transform: translateY(-30px); transition: all 0.3s;
+    display: flex; flex-direction: column; border: 1px solid #e4e6eb;
+}
+.create-post-modal.active .create-post-content { transform: translateY(0); }
+.create-post-header { padding: 15px 20px; border-bottom: 1px solid #f0f2f5; display: flex; justify-content: space-between; align-items: center; }
+.create-post-header h3 { margin: 0; font-size: 18px; font-weight: 700; color: #1c1e21; text-align: center; flex: 1; }
+.create-post-close { font-size: 22px; color: #65676b; cursor: pointer; padding: 5px; transition: 0.2s; }
+.create-post-close:hover { color: #ed4245; transform: scale(1.1); }
+.create-post-body { padding: 20px; }
+.create-post-user { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+.create-post-user img { width: 45px; height: 45px; border-radius: 50%; object-fit: cover; }
+.create-post-user-info .name { font-weight: 700; font-size: 15px; color: #1c1e21; }
+.create-post-user-info .privacy { background: #f0f2f5; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; cursor: pointer; color: #4b4b4b;}
+.create-post-textarea { width: 100%; border: none; outline: none; resize: none; font-size: 16px; font-family: inherit; min-height: 120px; margin-bottom: 15px; color: #1c1e21; }
+.create-post-addons { border: 1px solid #e4e6eb; border-radius: 8px; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+.create-post-addons span { font-weight: 600; font-size: 14px; color: #1c1e21; }
+.create-post-addons-icons { display: flex; gap: 15px; }
+.create-post-addons-icons i { font-size: 22px; cursor: pointer; transition: transform 0.2s;}
+.create-post-addons-icons i:hover { transform: scale(1.1); }
+.create-post-footer { padding: 15px 20px; }
+.btn-submit-post { width: 100%; background: #1877f2; color: #fff; border: none; padding: 12px; border-radius: 8px; font-weight: 700; font-size: 15px; cursor: pointer; transition: 0.2s; }
+.btn-submit-post:hover { background: #166fe5; }

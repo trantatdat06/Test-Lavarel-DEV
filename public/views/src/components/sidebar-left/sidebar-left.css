@@ -1,0 +1,176 @@
+/* src/components/sidebar-left/sidebar-left.css */
+
+.sidebar-left-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* 1. THANH SIDEBAR CHÍNH (Giao diện Xanh Navy đậm đồng bộ với Auth) */
+.page-server-bar {
+    width: 72px;
+    background-color: #003366; /* Chuyển sang xanh đậm của trang đăng nhập */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    padding-bottom: 120px;
+    gap: 4px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.page-server-bar::-webkit-scrollbar { display: none; } 
+
+/* FIX: Icon luôn tròn, không bị móp dẹt trên Mobile */
+.page-icon {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;  /* Chống móp chiều rộng trên Safari/WebKit */
+    min-height: 48px; /* Chống móp chiều cao trên Safari/WebKit */
+    aspect-ratio: 1 / 1;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2); /* Sáng nhẹ trên nền xanh */
+    color: #ffffff; /* Icon màu trắng */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease-in-out;
+    font-size: 18px;
+    user-select: none;
+}
+
+.page-icon img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+.page-icon:hover { border-radius: 16px; background-color: #ffffff; color: #003366; }
+.page-icon.active { border-radius: 16px; background-color: #ffffff; color: #003366; }
+
+/* Vạch trắng trạng thái */
+.page-icon::before {
+    content: ''; position: absolute; left: -12px; top: 50%; transform: translateY(-50%);
+    width: 8px; height: 8px; border-radius: 50%; background-color: #ffffff; opacity: 0; transition: all 0.2s;
+}
+.page-icon:hover::before { opacity: 1; height: 20px; border-radius: 4px; }
+.page-icon.active::before { opacity: 1; height: 40px; border-radius: 4px; }
+
+/* Vạch kẻ ngang */
+.page-separator { width: 32px; height: 2px; background-color: rgba(255, 255, 255, 0.3); margin: 4px 0; border-radius: 1px; flex-shrink: 0; }
+
+/* ==================================== */
+/* HIỆU ỨNG KÉO THẢ (DISCORD STYLE)     */
+/* ==================================== */
+.drag-over-top::after, .drag-over-bottom::after {
+    content: ''; position: absolute; left: 15%; right: 15%; height: 4px;
+    background-color: #23a559; border-radius: 2px; z-index: 100; pointer-events: none;
+}
+.drag-over-top::after { top: -6px; }
+.drag-over-bottom::after { bottom: -6px; }
+.drag-over-folder .page-icon { outline: 2px solid #23a559; outline-offset: 2px; border-radius: 16px; }
+
+/* ==================================== */
+/* GROUP VÀ FOLDER                      */
+/* ==================================== */
+.group-wrapper { 
+    position: relative; display: flex; flex-direction: column; align-items: center; width: 100%; 
+    flex-shrink: 0; /* Ép không cho dẹt folder group */
+}
+
+.folder-collapsed-grid {
+    display: grid !important; 
+    grid-template-columns: repeat(2, 1fr); 
+    grid-template-rows: repeat(2, 1fr);
+    gap: 3px; padding: 7px; border-radius: 16px !important; box-sizing: border-box;
+    place-items: center; /* Đảm bảo các ô nằm giữa, không bị kéo giãn */
+}
+
+.folder-collapsed-grid img, .folder-collapsed-grid .mini-fallback {
+    width: 15px; height: 15px; /* Ép tuyệt đối kích thước 15x15, bỏ 100% để Safari không bóp */
+    min-width: 15px; min-height: 15px;
+    aspect-ratio: 1 / 1; border-radius: 50%; object-fit: cover;
+    overflow: hidden;
+}
+
+.folder-collapsed-grid .mini-fallback {
+    display: flex; align-items: center; justify-content: center;
+    background-color: rgba(255, 255, 255, 0.25); /* Tách biệt với nền icon cha */
+    color: #ffffff;
+}
+
+/* FIX QUAN TRỌNG: Ép icon bên trong nhỏ lại để không làm nứt khung lưới */
+.folder-collapsed-grid .mini-fallback i, 
+.folder-collapsed-grid .mini-fallback svg {
+    font-size: 8px !important;
+    width: 8px !important;
+    height: 8px !important;
+}
+
+.group-expanded-pill {
+    display: flex; flex-direction: column; align-items: center; width: 56px;
+    border-radius: 28px; padding: 4px 0 8px 0; gap: 8px; margin-bottom: 4px; transition: all 0.3s ease;
+    flex-shrink: 0; /* Ép không cho móp pill bg bọc ngoài */
+}
+
+.group-items-container { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; }
+.group-items-container .page-icon { 
+    width: 40px; height: 40px; 
+    min-width: 40px; min-height: 40px; /* Chống móp icon con */
+    aspect-ratio: 1 / 1; 
+}
+
+.group-edit, .group-delete {
+    position: absolute; width: 16px; height: 16px; border-radius: 50%; font-size: 9px;
+    display: flex; justify-content: center; align-items: center; color: white;
+    opacity: 0; transition: opacity 0.2s; cursor: pointer; border: 1.5px solid #003366; z-index: 10;
+}
+.group-delete { top: -2px; right: 8px; background: #ed4245; }
+.group-edit { bottom: -2px; right: 8px; background: #f5a623; }
+.group-wrapper:hover .group-delete, .group-wrapper:hover .group-edit { opacity: 1; }
+
+.add-group-btn, .explore-btn {
+    width: 48px; height: 48px; 
+    min-width: 48px; min-height: 48px; /* Chống móp nút thêm/khám phá */
+    border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    background: rgba(255, 255, 255, 0.2); cursor: pointer; transition: 0.2s; flex-shrink: 0;
+}
+.add-group-btn { color: #ffffff; margin-top: 10px; }
+.add-group-btn:hover { background: #23a559; color: white; border-radius: 16px; }
+.explore-btn { color: #ffffff; margin-top: 4px; }
+.explore-btn:hover { background: #ffffff; color: #003366; border-radius: 16px; }
+
+/* Panel menu bên phải icon bar */
+.context-menu-panel { flex: 1; background-color: #f3f4f6; padding: 20px; overflow-y: auto; border-right: 1px solid #e4e6eb; }
+.context-menu-panel::-webkit-scrollbar { width: 0; }
+.bav-logo-placeholder { width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; justify-content: center; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px;}
+.bav-logo-placeholder img { width: 35px; height: 35px; object-fit: contain; }
+.card-box { background: #ffffff; border-radius: 12px; padding: 15px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
+
+/* ================= CSS MODAL POPUP ================= */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(2px); 
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999999 !important; opacity: 0; visibility: hidden; transition: all 0.3s;
+}
+
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-content {
+    background: #fff; padding: 25px; border-radius: 12px; width: 320px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2); transform: translateY(-30px); transition: all 0.3s;
+}
+.modal-overlay.active .modal-content { transform: translateY(0); }
+.modal-header { font-size: 1.15rem; font-weight: 700; margin-bottom: 20px; color: #1c1e21; }
+.modal-input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #dbdbdb; border-radius: 8px; box-sizing: border-box; outline: none; font-family: inherit; }
+.modal-input:focus { border-color: #003366; box-shadow: 0 0 0 3px rgba(0, 51, 102, 0.1); }
+.modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 10px; }
+.btn-cancel { padding: 10px 18px; border: none; background: #e4e6eb; border-radius: 8px; cursor: pointer; color: #1c1e21; font-weight: 600; }
+.btn-save { padding: 10px 18px; border: none; background: #003366; border-radius: 8px; cursor: pointer; color: #fff; font-weight: 600; }
