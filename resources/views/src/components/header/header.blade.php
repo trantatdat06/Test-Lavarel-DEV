@@ -72,7 +72,7 @@
                     <i class="fa-solid fa-circle-user"></i> <span id="header-display-name">Hồ sơ cá nhân</span>
                 </div>
                 <hr>
-                <div class="dropdown-item logout" onclick="sessionStorage.clear(); window.location.href='{{ url('page/auth/auth.blade.php') }}';">
+                <div class="dropdown-item logout" onclick="sessionStorage.clear(); window.location.href='{{ url('/auth') }}';">
                     <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
                 </div>
             </div>

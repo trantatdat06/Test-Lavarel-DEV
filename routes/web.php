@@ -23,6 +23,7 @@ Route::get('/src/{path}', function ($path) {
     // Nếu không tìm thấy thì báo lỗi 404
     return abort(404);
 })->where('path', '.*'); // Cho phép tham số path chứa nhiều thư mục lồng nhau
+
 // Trong routes/web.php
 Route::get('/profile/tabs/{tabName}', function ($tabName) {
     // Kiểm tra file view có tồn tại không trước khi trả về
@@ -33,4 +34,9 @@ Route::get('/profile/tabs/{tabName}', function ($tabName) {
     }
     
     return response()->json(['error' => 'Tab not found'], 404);
+});
+
+Route::get('/auth', function () {
+    // Trỏ đến file resources/views/page/auth/auth.blade.php
+    return view('page.auth.auth'); 
 });
