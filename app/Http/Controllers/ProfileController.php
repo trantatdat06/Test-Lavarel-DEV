@@ -17,10 +17,7 @@ class ProfileController extends Controller
         $user = User::with('faculty')->where('student_code', $studentCode)->firstOrFail();
         $faculties = Faculty::all();
 
-        $ongoingProject = Event::whereHas('participants', function($query) use ($user) {
-            $query->where('user_id', $user->id)->where('status', 'going');
-        })->where('end_time', '>=', now())->orderBy('end_time', 'asc')->first();
-
+        // 1. LẤY SỰ KIỆN TRƯỜNG (Loại: event)
         $events = DB::table('event_participants')
             ->join('events', 'event_participants.event_id', '=', 'events.id')
             ->where('event_participants.user_id', $user->id)
@@ -29,12 +26,14 @@ class ProfileController extends Controller
             ->get()->map(function($e) {
                 return [
                     'type' => 'event', 'id' => $e->id, 'title' => $e->title,
-                    'start' => Carbon::parse($e->start_time), 'timeLabel' => Carbon::parse($e->start_time)->format('H:i'),
-                    'timeDetail' => Carbon::parse($e->start_time)->format('h:i A') . ' - ' . Carbon::parse($e->end_time)->format('h:i A'),
-                    'location' => $e->location ?? 'BAV', 'status' => $e->proof_status, 'color' => '#6b4ce6' 
+                    'start' => Carbon::parse($e->start_time)->toIso8601String(),
+                    'timeLabel' => Carbon::parse($e->start_time)->format('H:i'),
+                    'timeDetail' => Carbon::parse($e->start_time)->format('H:i') . ' - ' . Carbon::parse($e->end_time)->format('H:i'),
+                    'location' => $e->location ?? 'Hội trường BAV', 'status' => $e->proof_status, 'color' => '#6b4ce6' 
                 ];
             });
 
+        // 2. LẤY LỊCH CÁ NHÂN (Loại: task)
         $tasks = DB::table('user_tasks')
             ->where('user_id', $user->id)
             ->select('id', 'title', 'due_date', 'is_completed')
@@ -42,35 +41,25 @@ class ProfileController extends Controller
                 $time = Carbon::parse($t->due_date);
                 return [
                     'type' => 'task', 'id' => $t->id, 'title' => $t->title,
-                    'start' => $time, 'timeLabel' => $time->format('H:i'),
-                    'timeDetail' => $time->format('h:i A') . ' (Lịch cá nhân)',
-                    'location' => 'Nhiệm vụ', 'status' => $t->is_completed ? 'completed' : 'pending', 'color' => '#e84c6c' 
+                    'start' => $time->toIso8601String(),
+                    'timeLabel' => $time->format('H:i'),
+                    'timeDetail' => $time->format('H:i') . ' (Lịch cá nhân)',
+                    'location' => 'Việc cá nhân', 'status' => $t->is_completed ? 'completed' : 'pending', 'color' => '#e84c6c' 
                 ];
             });
+
+        // 3. TẠO DỮ LIỆU MẪU LỊCH HỌC (Loại: class)
+        $classes = collect([
+            [
+                'type' => 'class', 'id' => 999, 'title' => 'Lập trình Web nâng cao (Phòng 402)',
+                'start' => Carbon::now()->setTime(13, 0)->toIso8601String(),
+                'timeLabel' => '13:00', 'timeDetail' => '13:00 - 15:30',
+                'location' => 'Giảng đường D2', 'status' => 'going', 'color' => '#23a559'
+            ]
+        ]);
             
-        $schedule = $events->concat($tasks)->sortBy('start')->values()->all();
-
-        $managedPages = DB::table('pages')->where('created_by', $user->id)
-            ->select('id', 'name', 'avatar', 'description')->get();
-
-        $savedPosts = [];
-        if (\Illuminate\Support\Facades\Schema::hasTable('post_saves')) {
-            $savedPosts = DB::table('post_saves')
-                ->join('posts', 'post_saves.post_id', '=', 'posts.id')
-                ->join('pages', 'posts.page_id', '=', 'pages.id')
-                ->where('post_saves.user_id', $user->id)
-                ->select('posts.id', 'posts.content', 'pages.name as page_name', 'post_saves.created_at')
-                ->orderBy('post_saves.created_at', 'desc')
-                ->get()->map(function($p) {
-                    return [
-                        'id' => $p->id, 'page_name' => $p->page_name,
-                        'title' => Str::limit($p->content, 65),
-                        'saved_at' => Carbon::parse($p->created_at)->format('d/m/Y')
-                    ];
-                });
-        }
-
-        $privacy = json_decode($user->privacy_settings, true) ?? [];
+        // Gộp cả 3 loại
+        $schedule = $events->concat($tasks)->concat($classes)->sortBy('start')->values()->all();
 
         $profileData = [
             'name' => $user->full_name, 'msv' => $user->student_code, 'email' => $user->email,
@@ -80,17 +69,13 @@ class ProfileController extends Controller
             'faculty' => $user->faculty ? $user->faculty->name : '', 'bio' => $user->bio ?? '',
             'avatar' => $user->avatar ?? "https://ui-avatars.com/api/?name=".urlencode($user->full_name)."&background=4a66f0&color=fff",
             'cover' => $user->cover ?? "https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000",
-            'privacy' => $privacy,
-            'ongoingProject' => $ongoingProject ? $ongoingProject->title : 'Chưa có',
+            'privacy' => json_decode($user->privacy_settings, true) ?? [],
             'schedule' => $schedule,
-            'managedPages' => $managedPages,
-            'savedPosts' => $savedPosts
+            'managedPages' => DB::table('pages')->where('created_by', $user->id)->get(),
+            'savedPosts' => []
         ];
 
-        return view('src.modules.feed.profile.profile', [
-            'profileData' => json_encode($profileData),
-            'faculties' => $faculties
-        ]);
+        return view('src.modules.feed.profile.profile', ['profileData' => json_encode($profileData), 'faculties' => $faculties]);
     }
 
     public function update(Request $request, $studentCode) {
@@ -117,24 +102,13 @@ class ProfileController extends Controller
         return response()->json(['success' => true, 'message' => 'Nộp minh chứng thành công!']);
     }
 
-    // ĐÂY LÀ HÀM XỬ LÝ TẠO LỊCH CÁ NHÂN (TODO)
     public function createTask(Request $request, $studentCode) {
         $user = User::where('student_code', $studentCode)->firstOrFail();
-        
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'due_date' => 'required|date'
-        ]);
-
+        $request->validate(['title' => 'required|string|max:255', 'due_date' => 'required']);
         DB::table('user_tasks')->insert([
-            'user_id' => $user->id,
-            'title' => $request->title,
-            'due_date' => Carbon::parse($request->due_date),
-            'is_completed' => false,
-            'created_at' => now(),
-            'updated_at' => now()
+            'user_id' => $user->id, 'title' => $request->title, 'due_date' => Carbon::parse($request->due_date),
+            'is_completed' => false, 'created_at' => now(), 'updated_at' => now()
         ]);
-
         return response()->json(['success' => true, 'message' => 'Đã thêm lịch trình thành công!']);
     }
 }
