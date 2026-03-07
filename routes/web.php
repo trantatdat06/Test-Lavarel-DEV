@@ -41,3 +41,7 @@ Route::post('/profile/{studentCode}/events/{eventId}/proof', [ProfileController:
 
 // Tạo lịch cá nhân / To-do
 Route::post('/profile/{studentCode}/tasks', [ProfileController::class, 'createTask']);
+// Route chuyên dụng để load nội dung từng Tab trong Profile
+Route::get('/profile/{studentCode}/tab/{tabName}', [ProfileController::class, 'getTab']);
+// Route để thay đổi trạng thái hoàn thành của task
+Route::post('/profile/{studentCode}/tasks/{id}/toggle', [ProfileController::class, 'toggleTask']);

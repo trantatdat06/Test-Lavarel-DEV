@@ -10,13 +10,15 @@ class User extends Authenticatable
 {
     use HasFactory, SoftDeletes;
 
+    // ĐÃ CẬP NHẬT: Xóa class_id, thêm class_name, job, gender, dob, social_links, privacy_settings
     protected $fillable = [
         'student_code','email','password','full_name','display_name',
-        'phone','faculty_id','class_id','role','account_status',
+        'phone','faculty_id','class_name','role','account_status',
         'requested_role','role_request_reason','role_request_evidence',
         'role_requested_at','role_approved_at','role_approved_by','role_reject_reason',
         'upgrade_attempt_count','upgrade_locked_at','first_login',
         'avatar','cover','bio','website','email_verified_at',
+        'job', 'gender', 'dob', 'social_links', 'privacy_settings'
     ];
 
     protected $hidden = ['password','remember_token'];
