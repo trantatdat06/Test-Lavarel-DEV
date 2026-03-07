@@ -45,3 +45,10 @@ Route::post('/profile/{studentCode}/tasks', [ProfileController::class, 'createTa
 Route::get('/profile/{studentCode}/tab/{tabName}', [ProfileController::class, 'getTab']);
 // Route để thay đổi trạng thái hoàn thành của task
 Route::post('/profile/{studentCode}/tasks/{id}/toggle', [ProfileController::class, 'toggleTask']);
+// Route xóa lịch trình
+Route::delete('/profile/{studentCode}/tasks/{id}', [ProfileController::class, 'deleteTask']);
+// Route nộp minh chứng (dùng cho cả Sự kiện và Lịch học bổ sung)
+Route::post('/profile/{studentCode}/submit-proof/{type}/{id}', [ProfileController::class, 'submitProof']);
+Route::post('/profile/{studentCode}/tasks/{taskId}/proof-gps', [\App\Http\Controllers\ProfileController::class, 'submitTaskProofGps']);
+Route::post('/profile/{studentCode}/classes', [\App\Http\Controllers\ProfileController::class, 'createClass']);
+Route::delete('/profile/{studentCode}/classes/{id}', [\App\Http\Controllers\ProfileController::class, 'deleteClass']);

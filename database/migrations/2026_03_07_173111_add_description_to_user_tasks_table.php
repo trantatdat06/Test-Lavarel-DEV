@@ -7,20 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Chạy migration để thêm cột.
      */
     public function up(): void
     {
-        $table->text('description')->nullable()->after('title');
+        // Bạn THIẾU phần bao bọc Schema::table này:
+        Schema::table('user_tasks', function (Blueprint $table) {
+            $table->text('description')->nullable()->after('title');
+        });
     }
 
     /**
-     * Reverse the migrations.
+     * Hoàn tác migration.
      */
     public function down(): void
     {
         Schema::table('user_tasks', function (Blueprint $table) {
-            //
+            $table->dropColumn('description');
         });
     }
 };
