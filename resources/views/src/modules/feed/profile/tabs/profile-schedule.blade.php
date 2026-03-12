@@ -398,7 +398,7 @@
                 
                 // ĐOẠN NÀY ĐÃ ĐƯỢC SỬA LẠI CHUẨN XÁC 100%
                 const locTag = p.latitude 
-                    ? `<a href="https://www.google.com/maps?q=${p.latitude},${p.longitude}" target="_blank" style="color:#1877f2; text-decoration:none; font-weight:600;"><i class="fa-solid fa-location-dot"></i> Xem trên Bản đồ</a>` 
+                    ? `<a href="https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}" target="_blank" style="color:#1877f2; text-decoration:none; font-weight:600;"><i class="fa-solid fa-location-dot"></i> Xem trên Bản đồ</a>` 
                     : '<span style="color:#8e8e8e;">Không có vị trí GPS</span>';
                 
                 html += `

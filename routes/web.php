@@ -52,3 +52,6 @@ Route::post('/profile/{studentCode}/submit-proof/{type}/{id}', [ProfileControlle
 Route::post('/profile/{studentCode}/tasks/{taskId}/proof-gps', [\App\Http\Controllers\ProfileController::class, 'submitTaskProofGps']);
 Route::post('/profile/{studentCode}/classes', [\App\Http\Controllers\ProfileController::class, 'createClass']);
 Route::delete('/profile/{studentCode}/classes/{id}', [\App\Http\Controllers\ProfileController::class, 'deleteClass']);
+
+// Route gửi yêu cầu tạo Page mới
+Route::post('/profile/{studentCode}/request-page', [\App\Http\Controllers\ProfileController::class, 'submitPageRequest']);
