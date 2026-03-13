@@ -74,3 +74,10 @@ Route::post('/profile/{studentCode}/submit-proof/{type}/{id}', [ProfileControlle
 Route::post('/profile/{studentCode}/tasks/{taskId}/proof-gps', [\App\Http\Controllers\ProfileController::class, 'submitTaskProofGps']);
 Route::post('/profile/{studentCode}/classes', [\App\Http\Controllers\ProfileController::class, 'createClass']);
 Route::delete('/profile/{studentCode}/classes/{id}', [\App\Http\Controllers\ProfileController::class, 'deleteClass']);
+
+// ==========================================
+// CÁC ROUTE XỬ LÝ BÀI VIẾT (POSTS)
+// ==========================================
+
+// Route nhận dữ liệu bài viết mới gửi lên từ Form
+Route::post('/posts', [PostController::class, 'store'])->name('posts.store');

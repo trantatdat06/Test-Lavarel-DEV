@@ -2,10 +2,6 @@
 
 <div class="feed-main-container">
     
-    <div style="margin-bottom: 20px;">
-        @include('src.components.post-composer.post-composer')
-    </div>
-
     <div class="story-wrapper card-bg" style="margin-bottom: 20px;">
         <div class="story-item add-story">
             <div class="story-avatar">
