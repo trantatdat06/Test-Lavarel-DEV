@@ -21,6 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'         => EnsureRolePermission::class,
             'guest.explore'=> EnsureGuestExploreOnly::class,
         ]);
+
+        // Thêm cấu hình bỏ qua CSRF token cho các route của Form để test bằng Postman
+        $middleware->validateCsrfTokens(except: [
+            'forms/store',
+            'forms/*/submit',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

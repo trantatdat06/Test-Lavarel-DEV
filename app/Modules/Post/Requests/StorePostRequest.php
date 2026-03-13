@@ -6,6 +6,12 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StorePostRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        // Cho phép đăng bài để test
+        return true; 
+    }
+
     public function rules(): array
     {
         return [
