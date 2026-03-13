@@ -7,6 +7,7 @@ use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class ProfileController extends Controller
 {
@@ -200,6 +201,49 @@ class ProfileController extends Controller
     public function deleteClass($studentCode, $id) {
         $user = User::where('student_code', $studentCode)->firstOrFail();
         DB::table('user_classes')->where('id', $id)->where('user_id', $user->id)->delete();
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * VAI TRÒ: Gửi yêu cầu tạo Trang (Page) mới
+     */
+    public function submitPageRequest(Request $request, $studentCode) {
+        $user = User::where('student_code', $studentCode)->firstOrFail();
+
+        // KIỂM TRA: Nếu đã dùng hết 3 lượt (upgrade_attempt_count >= 3) thì chặn lại
+        if ($user->upgrade_attempt_count >= 3) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Bạn đã dùng hết 3 lượt yêu cầu. Tính năng này đã bị khóa tạm thời!'
+            ], 403);
+        }
+
+        // 1. Tạo Page mới với trạng thái 'pending' (Chờ duyệt)
+        $pageId = DB::table('pages')->insertGetId([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name) . '-' . time(),
+            'category' => $request->category,
+            'description' => $request->description,
+            'status' => 'pending', 
+            'created_by' => $user->id,
+            'type' => 'public',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 2. Gán quyền Admin 'pending'
+        DB::table('page_members')->insert([
+            'page_id' => $pageId,
+            'user_id' => $user->id,
+            'role' => 'admin',
+            'status' => 'pending', 
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 3. Cộng thêm 1 vào số lần đã yêu cầu (Tương đương với việc bị trừ đi 1 lượt)
+        $user->increment('upgrade_attempt_count');
+
         return response()->json(['success' => true]);
     }
 }

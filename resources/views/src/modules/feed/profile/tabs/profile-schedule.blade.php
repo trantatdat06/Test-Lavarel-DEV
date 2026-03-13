@@ -1,47 +1,83 @@
 <style>
+    /* CSS GỐC CỦA BẠN */
     .schedule-card-wrapper { background: #fff; border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); margin-top: 20px; font-family: 'Inter', sans-serif; }
     .schedule-header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
     .month-year-picker { display: flex; gap: 10px; align-items: center; }
     .styled-select { padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; font-weight: 600; color: #1c1e21; outline: none; cursor: pointer; background: #f8f9fa; }
     
-    .pill-filters { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+    /* Thêm cursor: grab để kéo thả */
+    .pill-filters { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; cursor: grab; user-select: none; scrollbar-width: none; }
+    .pill-filters::-webkit-scrollbar { display: none; }
+    .pill-filters:active { cursor: grabbing; }
     .pill-filters button { background: #f0f2f5; color: #4b4b4b; border: none; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 13px; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .pill-filters button.active { background: #e7f3ff; color: #1877f2; }
 
-    .date-slider { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; scroll-behavior: smooth; }
+    /* Thêm cursor: grab để kéo thả */
+    .date-slider { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 25px; scroll-behavior: smooth; cursor: grab; user-select: none; scrollbar-width: none; }
+    .date-slider::-webkit-scrollbar { display: none; }
+    .date-slider:active { cursor: grabbing; scroll-behavior: auto; }
     .date-item { min-width: 60px; height: 75px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #f0f2f5; cursor: pointer; transition: 0.2s; background: #fff; }
     .date-item.active { background: #1877f2; border-color: #1877f2; color: #fff; box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3); }
-    .date-item .d-name { font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 5px; }
-    .date-item .d-num { font-size: 18px; font-weight: 800; }
+    .date-item .d-name { font-size: 11px; text-transform: uppercase; font-weight: 700; margin-bottom: 5px; pointer-events: none; }
+    .date-item .d-num { font-size: 18px; font-weight: 800; pointer-events: none; }
 
+    /* Fix tràn chữ: min-width: 0 và word-break */
     .t-row { display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start; }
-    .t-time-col { width: 50px; font-size: 13px; font-weight: 700; color: #65676b; padding-top: 15px; text-align: right; }
-    .t-card { flex: 1; background: #f8f9fa; border-left: 5px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; transition: 0.2s; }
+    .t-time-col { width: 50px; font-size: 13px; font-weight: 700; color: #65676b; padding-top: 15px; text-align: right; flex-shrink: 0; }
+    .t-card { flex: 1; min-width: 0; background: #f8f9fa; border-left: 5px solid #ddd; border-radius: 12px; padding: 15px; display: flex; flex-direction: column; gap: 10px; transition: 0.2s; }
     .t-card.completed { border-left-color: #23a559 !important; background: #f0f9f4; opacity: 0.8; }
     .t-card.completed .title { text-decoration: line-through; color: #65676b; }
 
-    .t-header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
-    .t-info .title { font-weight: 700; color: #1c1e21; margin-bottom: 4px; }
+    .t-header { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; gap: 15px; }
+    .t-info { flex: 1; min-width: 0; }
+    .t-info .title { font-weight: 700; color: #1c1e21; margin-bottom: 4px; word-wrap: break-word; line-height: 1.4; }
     .t-info .time { font-size: 12px; color: #65676b; }
-    .t-desc { font-size: 13px; color: #65676b; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #eee; margin-top: 5px; }
+    .t-desc { font-size: 13px; color: #65676b; background: #fff; padding: 8px; border-radius: 6px; border: 1px solid #eee; margin-top: 5px; word-wrap: break-word; }
 
     .t-footer-actions { display: flex; gap: 10px; margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px; align-items: center; flex-wrap: wrap;}
-    .btn-action-small { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid transparent; transition: 0.2s; background: #fff; }
+    .btn-action-small { padding: 6px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; border: 1px solid transparent; transition: 0.2s; background: #fff; white-space: nowrap;}
     .btn-delete { color: #dc3545; border-color: #dc3545; }
     .btn-delete:hover { background: #dc3545; color: #fff; }
     .btn-proof { color: #1877f2; border-color: #1877f2; }
     .btn-proof:hover { background: #1877f2; color: #fff; }
     
-    .btn-done { background: #fff; border: 1px solid #23a559; color: #23a559; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+    .btn-done { background: #fff; border: 1px solid #23a559; color: #23a559; padding: 6px 12px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.2s; white-space: nowrap;}
     .btn-done:hover { background: #23a559; color: #fff; }
 
     .quick-add-card { background: #f8f9fa; border: 1px solid #e4e6eb; border-radius: 12px; padding: 20px; margin-top: 30px; display: none; }
     .t-row.removing { transform: translateX(100px); opacity: 0; transition: 0.4s; }
+    
+    /* Gói Form thành Flex Row để dẽ responsive */
+    .form-flex-row { display: flex; gap: 10px; flex-wrap: wrap; }
 
-    /* Modal xem lịch sử nộp */
     .proof-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: none; align-items: center; justify-content: center; }
     .proof-modal-content { background: #fff; padding: 25px; border-radius: 16px; width: 90%; max-width: 450px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
     .proof-version-item { border: 1px solid #eee; border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #fafafa; }
+
+    /* =========================================
+       CSS MỚI: RESPONSIVE CHO ĐIỆN THOẠI
+       ========================================= */
+    @media (max-width: 720px) {
+        .schedule-card-wrapper { padding: 15px; }
+        .schedule-header-controls { flex-direction: column; align-items: flex-start; }
+        .pill-filters { width: 100%; }
+        
+        .date-item { background: #65676b; color: #d0d0d0; border: none; }
+        .date-item.active { background: #3b82f6; color: #fff; }
+
+        .t-time-col { color: #ff4d4f; font-size: 12px; padding-top: 12px; }
+        .t-card { background: #2b2d3c; border-left-width: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .t-info .title { color: #fff; font-size: 14px; font-style: italic; }
+        .t-info .time { color: #a0a0b0; }
+        .t-desc { background: #1f212d; border-color: #3a3b4c; color: #d0d0d0; }
+        
+        .t-header { flex-direction: column; align-items: stretch; }
+        .btn-action-small, .btn-done { flex: 1; text-align: center; width: 100%; }
+        
+        /* Chuyển các ô Form Add thành hàng dọc */
+        .form-flex-row { flex-direction: column; }
+        .quick-add-card input, .quick-add-card select, .quick-add-card button { width: 100% !important; box-sizing: border-box; }
+    }
 </style>
 
 @php
@@ -85,7 +121,7 @@
             <select id="sel-month" class="styled-select" onchange="window.updateScheduleUI()"></select>
             <select id="sel-year" class="styled-select" onchange="window.updateScheduleUI()"></select>
         </div>
-        <div class="pill-filters">
+        <div class="pill-filters" id="ui-pill-filters">
             <button class="active" onclick="window.setSchFilter('all', this)">Tổng hợp</button>
             <button onclick="window.setSchFilter('class', this)">Lịch học</button>
             <button onclick="window.setSchFilter('task', this)">Cá nhân</button>
@@ -100,13 +136,13 @@
         <div id="form-title-text" style="font-weight: 700; margin-bottom: 15px; text-transform: uppercase;">TẠO LỊCH MỚI</div>
         
         <div id="form-task-fields" style="display: none; flex-direction: column; gap: 10px;">
-            <div style="display: flex; gap: 10px;">
+            <div class="form-flex-row">
                 <input type="text" id="new-task-title" placeholder="Tiêu đề..." style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
                 <input type="datetime-local" id="new-task-date" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
             </div>
             <textarea id="new-task-desc" placeholder="Mô tả chi tiết..." style="padding: 10px; border-radius: 8px; border: 1px solid #ddd; height: 60px; font-family: inherit;"></textarea>
             
-            <div style="display: flex; gap: 10px; align-items: center;">
+            <div class="form-flex-row" style="align-items: center;">
                 <select id="new-task-comp-type" style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #ddd; outline: none;">
                     <option value="simple">Chỉ cần nhấn "Xong"</option>
                     <option value="proof">Bắt buộc nộp Ảnh & Định vị GPS</option>
@@ -116,20 +152,20 @@
         </div>
 
         <div id="form-class-fields" style="display: none; flex-direction: column; gap: 10px;">
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <input type="text" id="new-class-title" placeholder="Tên môn học..." style="flex: 2; min-width: 200px; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
-                <select id="new-class-day" style="flex: 1; min-width: 120px; padding: 10px; border-radius: 8px; border: 1px solid #ddd; outline: none;">
+            <div class="form-flex-row">
+                <input type="text" id="new-class-title" placeholder="Tên môn học..." style="flex: 2; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                <select id="new-class-day" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd; outline: none;">
                     <option value="2">Thứ 2</option><option value="3">Thứ 3</option><option value="4">Thứ 4</option>
                     <option value="5">Thứ 5</option><option value="6">Thứ 6</option><option value="7">Thứ 7</option>
                     <option value="1">Chủ nhật</option>
                 </select>
             </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <div class="form-flex-row">
                 <input type="time" id="new-class-start" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;" title="Giờ bắt đầu">
                 <input type="time" id="new-class-end" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;" title="Giờ kết thúc">
                 <input type="text" id="new-class-location" placeholder="Phòng học (VD: P.402-D2)" style="flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
             </div>
-            <button onclick="window.handleSaveClass(this)" style="background: #23a559; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; align-self: flex-end;">THÊM VÀO THỜI KHÓA BIỂU</button>
+            <button onclick="window.handleSaveClass(this)" style="background: #23a559; color: #fff; border: none; padding: 12px 25px; border-radius: 8px; font-weight: 600; cursor: pointer;">THÊM VÀO THỜI KHÓA BIỂU</button>
         </div>
     </div>
 </div>
@@ -152,6 +188,9 @@
         const now = new Date();
         const state = { month: now.getMonth(), year: now.getFullYear(), selectedDate: now.toLocaleDateString('en-CA'), filter: 'all' };
 
+        // Cờ trạng thái cho chức năng Kéo Thả
+        window.isDragging = false;
+
         window.updateScheduleUI = function() {
             state.month = parseInt(document.getElementById('sel-month').value);
             state.year = parseInt(document.getElementById('sel-year').value);
@@ -160,6 +199,8 @@
         };
 
         window.setSchFilter = function(f, btn) {
+            if(window.isDragging) return; // Nếu đang kéo chuột thì không click
+            
             state.filter = f;
             if (btn) {
                 document.querySelectorAll('.pill-filters button').forEach(b => b.classList.remove('active'));
@@ -203,7 +244,10 @@
             if(active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
 
-        window.selectSchDate = function(d) { state.selectedDate = d; renderSlider(); renderTimeline(); };
+        window.selectSchDate = function(d) { 
+            if(window.isDragging) return; // Không click nếu đang kéo
+            state.selectedDate = d; renderSlider(); renderTimeline(); 
+        };
 
         window.renderTimeline = function() {
             const container = document.getElementById('dynamic-timeline');
@@ -315,10 +359,9 @@
             } catch(e) { alert("Lỗi!"); btn.disabled = false; }
         };
 
-        // --- NGĂN CHẶN LỖI DOUBLE VÀ ÉP BUỘC CÓ GPS ---
         const fileInputEl = document.getElementById('static-proof-upload');
         window.uploadingTargetId = null;
-        window.isUploadingProof = false; // Cờ khóa click
+        window.isUploadingProof = false; 
 
         window.openProofUpload = function(taskId) { 
             if (window.isUploadingProof) return alert("Đang xử lý, vui lòng chờ...");
@@ -333,14 +376,13 @@
             
             const taskId = window.uploadingTargetId; 
             window.uploadingTargetId = null; 
-            window.isUploadingProof = true; // Khóa toàn bộ các nút nộp khác
+            window.isUploadingProof = true; 
 
             alert("Đang định vị... Bắt buộc phải có Vị Trí mới được nộp. Vui lòng chọn 'Cho phép' trên trình duyệt.");
             
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        // Chỉ khi lấy được GPS mới gọi hàm sendProofData
                         sendProofData(file, taskId, pos.coords.latitude, pos.coords.longitude);
                     },
                     (err) => {
@@ -352,7 +394,6 @@
                         else if(err.code == 2) msg += "Không có tín hiệu mạng/GPS.";
                         else if(err.code == 3) msg += "Hết thời gian chờ.";
                         
-                        // Báo lỗi và DỪNG LẠI, KHÔNG GỌI sendProofData
                         alert(msg + " \n\n=> Hủy nộp minh chứng vì KHÔNG CÓ GPS!");
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
@@ -385,7 +426,7 @@
             } catch(e) { 
                 alert("Lỗi kết nối mạng!"); 
             } finally {
-                window.isUploadingProof = false; // Mở khóa
+                window.isUploadingProof = false; 
                 fileInputEl.value = '';
             }
         }
@@ -396,7 +437,6 @@
             proofs.forEach(p => {
                 const date = new Date(p.created_at).toLocaleString('vi-VN');
                 
-                // ĐOẠN NÀY ĐÃ ĐƯỢC SỬA LẠI CHUẨN XÁC 100%
                 const locTag = p.latitude 
                     ? `<a href="https://www.google.com/maps?q=${p.latitude},${p.longitude}" target="_blank" style="color:#1877f2; text-decoration:none; font-weight:600;"><i class="fa-solid fa-location-dot"></i> Xem trên Bản đồ</a>` 
                     : '<span style="color:#8e8e8e;">Không có vị trí GPS</span>';
@@ -423,5 +463,36 @@
         renderSlider(); 
         const defaultBtn = document.querySelector('.pill-filters button.active');
         window.setSchFilter('all', defaultBtn);
+
+        // ==========================================
+        // JS MỚI: KÉO CHUỘT (DRAG TO SCROLL)
+        // ==========================================
+        function makeDraggable(elementId) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+            let isDown = false; let startX; let scrollLeft;
+
+            el.addEventListener('mousedown', (e) => {
+                isDown = true; window.isDragging = false;
+                startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft;
+            });
+            el.addEventListener('mouseleave', () => { isDown = false; });
+            el.addEventListener('mouseup', () => {
+                isDown = false;
+                setTimeout(() => { window.isDragging = false; }, 50); // Mở khóa click sau khi nhả chuột
+            });
+            el.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - el.offsetLeft;
+                const walk = (x - startX) * 2;
+                if (Math.abs(walk) > 5) { window.isDragging = true; } // Đánh dấu là đang kéo để không vô tình click
+                el.scrollLeft = scrollLeft - walk;
+            });
+        }
+
+        makeDraggable('ui-date-slider');
+        makeDraggable('ui-pill-filters');
+
     })();
 </script>
