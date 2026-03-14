@@ -13,6 +13,14 @@ use Illuminate\Support\Facades\Gate;
 class FormController extends Controller
 {
     /**
+     * HIỂN THỊ GIAO DIỆN TẠO FORM
+     */
+    public function create()
+    {
+        return view('form.create');
+    }
+
+    /**
      * TẠO FORM MỚI (Dành cho Admin/Ban tổ chức)
      */
     public function store(Request $request)
@@ -28,15 +36,16 @@ class FormController extends Controller
             'fields.*.options' => 'nullable|array',
         ]);
 
-        DB::transaction(function () use ($validated) {
-            $form = Form::create([
+        // 1. Gán kết quả của DB::transaction vào biến $form để lấy được ID của form vừa tạo
+        $form = DB::transaction(function () use ($validated) {
+            $newForm = Form::create([
                 'event_id' => $validated['event_id'] ?? null,
                 'title' => $validated['title'],
                 'description' => $validated['description'],
             ]);
 
             foreach ($validated['fields'] as $index => $fieldData) {
-                $form->fields()->create([
+                $newForm->fields()->create([
                     'label' => $fieldData['label'],
                     'type' => $fieldData['type'],
                     'required' => $fieldData['required'] ?? false,
@@ -44,9 +53,13 @@ class FormController extends Controller
                     'order' => $index,
                 ]);
             }
+            
+            return $newForm; // Trả dữ liệu ra ngoài vòng lặp
         });
 
-        return response()->json(['message' => 'Tạo biểu mẫu thành công!']);
+        // 2. Thay vì return response()->json(), ta Redirect người dùng sang trang xem Form
+        return redirect()->route('forms.show', $form->id)
+                         ->with('success', 'Tạo biểu mẫu thành công! Bạn có thể copy đường link này để chia sẻ.');
     }
 
     /**
@@ -156,5 +169,76 @@ class FormController extends Controller
         ]);
 
         return back()->with('success', 'Đã cập nhật trạng thái đơn thành công!');
+    }
+
+    /**
+     * XUẤT DỮ LIỆU ĐƠN RA FILE EXCEL (CSV)
+     */
+    public function export(Form $form)
+    {
+        // Lấy tất cả đơn nộp kèm theo thông tin User (Tài khoản sinh viên)
+        $submissions = $form->submissions()->with('user')->get();
+        $form->load('fields');
+
+        $fileName = "Danh_sach_don_" . \Str::slug($form->title) . "_" . date('Y-m-d') . ".csv";
+
+        $headers = array(
+            "Content-type"        => "text/csv; charset=utf-8",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $callback = function() use($submissions, $form) {
+            $file = fopen('php://output', 'w');
+            
+            // Fix lỗi font tiếng Việt khi mở bằng Excel (BOM)
+            fputs($file, $bom =(chr(0xEF) . chr(0xBB) . chr(0xBF)));
+
+            // 1. Tạo Dòng Tiêu Đề Cột
+            $columns = ['ID', 'Thời gian nộp', 'Trạng thái', 'Mã Sinh Viên', 'Họ và Tên', 'Email'];
+            foreach ($form->fields as $field) {
+                $columns[] = $field->label;
+            }
+            fputcsv($file, $columns);
+
+            // 2. Điền Dữ Liệu Từng Dòng
+            foreach ($submissions as $sub) {
+                $statusMap = [
+                    'pending' => 'Chờ duyệt',
+                    'approved' => 'Đã duyệt',
+                    'rejected' => 'Từ chối',
+                    'cancelled' => 'Đã hủy'
+                ];
+
+                $row = [
+                    $sub->id,
+                    \Carbon\Carbon::parse($sub->submitted_at)->format('H:i d/m/Y'),
+                    $statusMap[$sub->status] ?? $sub->status,
+                    // Lấy thông tin từ bảng User (Auto-fill)
+                    $sub->user ? $sub->user->student_code : 'Khách (Không đăng nhập)',
+                    $sub->user ? $sub->user->display_name : 'Khách',
+                    $sub->user ? $sub->user->email : 'N/A',
+                ];
+
+                // Đổ dữ liệu các câu hỏi tùy chọn
+                foreach ($form->fields as $field) {
+                    $fieldName = 'field_' . $field->id;
+                    $value = $sub->data[$fieldName] ?? '';
+                    
+                    if (is_array($value)) {
+                        $value = implode(', ', $value);
+                    } elseif (is_string($value) && str_starts_with($value, 'form_submissions/')) {
+                        $value = asset('storage/' . $value); // Biến file ảnh thành link để bấm vào xem được
+                    }
+                    $row[] = $value;
+                }
+                fputcsv($file, $row);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

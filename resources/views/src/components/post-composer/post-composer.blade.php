@@ -52,9 +52,9 @@
             
             <div style="margin-top: 10px; padding: 10px; border: 1px solid #e4e6eb; border-radius: 8px; background: #f8fafc;">
                 <div style="font-size: 13px; font-weight: 600; color: #4f46e5; margin-bottom: 6px;">
-                    <i class="fa-solid fa-link"></i> Đính kèm Link Form (Nếu có)
+                    <i class="fa-solid fa-link"></i> Đính kèm Link Sự kiện (Nếu có)
                 </div>
-                <input type="url" name="external_link" placeholder="Dán link vào đây: http://127.0.0.1:8000/forms/1" 
+                <input type="url" name="external_link" placeholder="Dán link vào đây." 
                     style="width: 100%; border: 1px solid #d1d5db; padding: 8px; border-radius: 6px; font-size: 14px; outline: none; box-sizing: border-box;">
             </div>
         </div>

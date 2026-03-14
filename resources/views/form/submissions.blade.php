@@ -7,7 +7,9 @@
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding: 40px 20px; margin: 0; }
         .container { max-width: 1000px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        h1 { font-size: 24px; color: #111827; margin-top: 0; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        .header-section { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e5e7eb; padding-bottom: 15px; margin-bottom: 20px; }
+        h1 { font-size: 24px; color: #111827; margin: 0; }
         
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #e5e7eb; padding: 12px 15px; text-align: left; font-size: 15px; }
@@ -24,12 +26,16 @@
         .bg-rejected { background-color: #fecaca; color: #991b1b; }
         
         /* Nút bấm hành động */
-        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: white; transition: 0.2s; margin-right: 5px; margin-bottom: 5px;}
+        .btn { padding: 8px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: white; transition: 0.2s; margin-right: 5px; margin-bottom: 5px; text-decoration: none;}
         .btn-approve { background-color: #10b981; }
         .btn-approve:hover { background-color: #059669; }
         .btn-reject { background-color: #ef4444; }
         .btn-reject:hover { background-color: #dc2626; }
         
+        /* Nút xuất file Excel mới */
+        .btn-export { background-color: #16a34a; display: flex; align-items: center; gap: 6px; }
+        .btn-export:hover { background-color: #15803d; }
+
         .alert-success { background-color: #def7ec; color: #03543f; padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #bcdecb; font-weight: 500; }
         .empty-message { text-align: center; padding: 30px; color: #6b7280; font-style: italic; }
     </style>
@@ -37,7 +43,12 @@
 <body>
 
 <div class="container">
-    <h1>Quản lý đơn: {{ $form->title }}</h1>
+    <div class="header-section">
+        <h1>Quản lý đơn: {{ $form->title }}</h1>
+        <a href="{{ route('forms.export', $form->id) }}" class="btn btn-export">
+            📥 Xuất Excel (CSV)
+        </a>
+    </div>
 
     @if(session('success'))
         <div class="alert-success">✅ {{ session('success') }}</div>
@@ -47,10 +58,10 @@
         <thead>
             <tr>
                 <th width="5%">ID</th>
-                <th width="45%">Nội dung đã điền</th>
+                <th width="35%">Người nộp (Auto-fill)</th>
+                <th width="30%">Câu trả lời tùy chỉnh</th>
                 <th width="15%">Trạng thái</th>
-                <th width="15%">Thời gian nộp</th>
-                <th width="20%">Hành động</th>
+                <th width="15%">Hành động</th>
             </tr>
         </thead>
         <tbody>
@@ -58,6 +69,16 @@
                 <tr>
                     <td>#{{ $sub->id }}</td>
                     
+                    <td>
+                        @if($sub->user)
+                            <strong>{{ $sub->user->display_name }}</strong><br>
+                            <span style="font-size: 13px; color: #6b7280;">Mã SV: {{ $sub->user->student_code }}</span><br>
+                            <span style="font-size: 13px; color: #6b7280;">Email: {{ $sub->user->email }}</span>
+                        @else
+                            <span style="color: #9ca3af; font-style: italic;">Người dùng Khách</span>
+                        @endif
+                    </td>
+
                     <td>
                         <ul class="data-list">
                             @foreach($sub->data as $key => $value)
@@ -74,7 +95,8 @@
 
                     <td>
                         @if($sub->status == 'pending')
-                            <span class="badge bg-pending">Chờ duyệt</span>
+                            <span class="badge bg-pending">Chờ duyệt</span><br>
+                            <span style="font-size: 12px; color: #9ca3af; margin-top: 4px; display: block;">{{ \Carbon\Carbon::parse($sub->submitted_at)->format('H:i d/m/Y') }}</span>
                         @elseif($sub->status == 'approved')
                             <span class="badge bg-approved">Đã duyệt</span>
                         @elseif($sub->status == 'rejected')
@@ -83,8 +105,6 @@
                             <span class="badge" style="background: #e5e7eb; color: #374151;">Đã hủy</span>
                         @endif
                     </td>
-
-                    <td>{{ \Carbon\Carbon::parse($sub->submitted_at)->format('H:i d/m/Y') }}</td>
 
                     <td>
                         <form action="{{ route('submissions.update', $sub->id) }}" method="POST" style="display:inline-block;">

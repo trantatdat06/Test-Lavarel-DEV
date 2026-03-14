@@ -49,13 +49,13 @@
                     <i class="fa-solid fa-file-signature"></i>
                 </div>
                 <div>
-                    <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Đính kèm Biểu mẫu</div>
-                    <div style="font-size: 12px; color: #64748b;">Nhấn vào nút bên cạnh để điền</div>
+                    <div style="font-weight: 700; font-size: 14px; color: #0f172a;">Đính kèm Hoạt động</div>
+                    <div style="font-size: 12px; color: #64748b;">Nhấn vào nút bên cạnh để xem chi tiết</div>
                 </div>
             </div>
             <a href="#" class="post-data-form-link" target="_blank" 
                style="background: #4f46e5; color: white; padding: 8px 16px; border-radius: 6px; font-weight: 600; font-size: 13px; text-decoration: none; white-space: nowrap; transition: 0.2s;">
-                Điền ngay
+                Xem chi tiết
             </a>
         </div>
     </div>

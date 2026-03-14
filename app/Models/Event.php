@@ -11,9 +11,9 @@ class Event extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'page_id', 'post_id', 'title', 'description',
-        'location', 'start_time', 'end_time',
-        'form_open_at', 'form_close_at',
+        'title', 'description', 'location', 'page_id', 
+        'start_time', 'end_time', 'form_open_at', 'form_close_at',
+        'has_training_point', 'point_amount', 'point_category'
     ];
 
     protected $casts = [
