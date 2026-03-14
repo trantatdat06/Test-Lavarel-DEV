@@ -25,7 +25,7 @@ class Event extends Model
 
     public function page()          { return $this->belongsTo(Page::class); }
     public function post()          { return $this->belongsTo(Post::class); }
-    public function forms()         { return $this->hasMany(Form::class); }
+    public function forms()         { return $this->hasMany(\App\Models\Form::class); }
     public function participants()  { return $this->belongsToMany(User::class, 'event_participants')->withPivot('status')->withTimestamps(); }
 
     public function isFormOpen(): bool

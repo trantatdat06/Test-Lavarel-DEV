@@ -181,6 +181,16 @@
                 }
             </script>
 
+            <div style="background: #eef2ff; border: 1px solid #c7d2fe; padding: 20px; border-radius: 8px; margin-bottom: 22px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: 600; color: #3730a3;">
+                    <input type="checkbox" name="auto_create_form" checked style="width: 18px; height: 18px;">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tự động tạo Form nộp minh chứng
+                </label>
+                <div style="font-size: 13px; color: #4f46e5; margin-top: 8px; margin-left: 28px;">
+                    Hệ thống sẽ tự động sinh ra một biểu mẫu yêu cầu sinh viên tải ảnh minh chứng đính kèm với sự kiện này.
+                </div>
+            </div>
+
             <button type="submit" class="btn-submit"><i class="fa-solid fa-calendar-plus"></i> Tạo sự kiện</button>
         </form>
     </div>

@@ -36,7 +36,6 @@ class FormController extends Controller
             'fields.*.options' => 'nullable|array',
         ]);
 
-        // 1. Gán kết quả của DB::transaction vào biến $form để lấy được ID của form vừa tạo
         $form = DB::transaction(function () use ($validated) {
             $newForm = Form::create([
                 'event_id' => $validated['event_id'] ?? null,
@@ -54,10 +53,9 @@ class FormController extends Controller
                 ]);
             }
             
-            return $newForm; // Trả dữ liệu ra ngoài vòng lặp
+            return $newForm; 
         });
 
-        // 2. Thay vì return response()->json(), ta Redirect người dùng sang trang xem Form
         return redirect()->route('forms.show', $form->id)
                          ->with('success', 'Tạo biểu mẫu thành công! Bạn có thể copy đường link này để chia sẻ.');
     }
@@ -67,11 +65,7 @@ class FormController extends Controller
      */
     public function show(Form $form)
     {
-        // Đã tắt kiểm tra quyền để khách vãng lai cũng xem được form
-        // $this->authorize('view', $form);
-        
         $form->load('fields');
-        
         return view('form.show', compact('form'));
     }
 
@@ -80,9 +74,6 @@ class FormController extends Controller
      */
     public function submit(Request $request, Form $form)
     {
-        // Đã tắt kiểm tra quyền để khách vãng lai cũng nộp được form
-        // $this->authorize('submit', $form);
-        
         $form->load('fields');
 
         $rules = [];
@@ -126,14 +117,17 @@ class FormController extends Controller
             }
         }
 
+        // --- BẮT ĐẦU ĐOẠN HACK TEST CHO AUTO-FILL ---
+        $testUser = $request->user() ?? \App\Models\User::first();
+
         FormSubmission::create([
             'form_id'      => $form->id,
-            // Sửa lại dòng này: Nếu có User đang đăng nhập thì lấy ID, nếu là khách thì để null
-            'user_id'      => $request->user() ? $request->user()->id : null, 
+            'user_id'      => $testUser ? $testUser->id : null, 
             'data'         => $validatedData,
             'status'       => 'pending',
             'submitted_at' => now(),
         ]);
+        // --- KẾT THÚC ĐOẠN HACK ---
 
         return back()->with('success', 'Đã gửi thông tin liên hệ thành công! Chúng tôi sẽ phản hồi sớm nhất.');
     }
@@ -143,11 +137,7 @@ class FormController extends Controller
      */
     public function submissions(Form $form)
     {
-        // Sử dụng Gate thay vì $this->authorize cho bản Laravel 12
-        //Gate::authorize('update', $form);
-
         $submissions = $form->submissions()->with('user')->latest()->paginate(30);
-
         return view('form.submissions', compact('form', 'submissions'));
     }
 
@@ -156,8 +146,6 @@ class FormController extends Controller
      */
     public function updateSubmission(Request $request, FormSubmission $submission)
     {
-        //Gate::authorize('update', $submission->form);
-
         $validated = $request->validate([
             'status' => 'required|in:approved,rejected,cancelled',
             'note'   => 'nullable|string'
@@ -176,7 +164,6 @@ class FormController extends Controller
      */
     public function export(Form $form)
     {
-        // Lấy tất cả đơn nộp kèm theo thông tin User (Tài khoản sinh viên)
         $submissions = $form->submissions()->with('user')->get();
         $form->load('fields');
 
@@ -192,18 +179,14 @@ class FormController extends Controller
 
         $callback = function() use($submissions, $form) {
             $file = fopen('php://output', 'w');
-            
-            // Fix lỗi font tiếng Việt khi mở bằng Excel (BOM)
             fputs($file, $bom =(chr(0xEF) . chr(0xBB) . chr(0xBF)));
 
-            // 1. Tạo Dòng Tiêu Đề Cột
             $columns = ['ID', 'Thời gian nộp', 'Trạng thái', 'Mã Sinh Viên', 'Họ và Tên', 'Email'];
             foreach ($form->fields as $field) {
                 $columns[] = $field->label;
             }
             fputcsv($file, $columns);
 
-            // 2. Điền Dữ Liệu Từng Dòng
             foreach ($submissions as $sub) {
                 $statusMap = [
                     'pending' => 'Chờ duyệt',
@@ -216,13 +199,11 @@ class FormController extends Controller
                     $sub->id,
                     \Carbon\Carbon::parse($sub->submitted_at)->format('H:i d/m/Y'),
                     $statusMap[$sub->status] ?? $sub->status,
-                    // Lấy thông tin từ bảng User (Auto-fill)
-                    $sub->user ? $sub->user->student_code : 'Khách (Không đăng nhập)',
+                    $sub->user ? $sub->user->student_code : 'Khách',
                     $sub->user ? $sub->user->display_name : 'Khách',
                     $sub->user ? $sub->user->email : 'N/A',
                 ];
 
-                // Đổ dữ liệu các câu hỏi tùy chọn
                 foreach ($form->fields as $field) {
                     $fieldName = 'field_' . $field->id;
                     $value = $sub->data[$fieldName] ?? '';
@@ -230,7 +211,7 @@ class FormController extends Controller
                     if (is_array($value)) {
                         $value = implode(', ', $value);
                     } elseif (is_string($value) && str_starts_with($value, 'form_submissions/')) {
-                        $value = asset('storage/' . $value); // Biến file ảnh thành link để bấm vào xem được
+                        $value = asset('storage/' . $value); 
                     }
                     $row[] = $value;
                 }

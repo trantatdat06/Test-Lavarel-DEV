@@ -8,7 +8,7 @@
     <style>
         body { 
             font-family: 'Google Sans', 'Roboto', 'Helvetica Neue', sans-serif; 
-            background-color: #f0ebf8; /* Nền tím nhạt */
+            background-color: #f0ebf8; 
             min-height: 100vh; 
             display: flex; 
             flex-direction: column;
@@ -19,117 +19,66 @@
             color: #202124;
         }
         
-        .form-container { 
-            width: 100%; 
-            max-width: 640px; 
-        }
+        .form-container { width: 100%; max-width: 640px; }
 
-        /* Phần Header Form (Banner màu trên cùng) */
         .form-header-card {
-            background: #ffffff;
-            border-radius: 8px;
-            border-top: 10px solid #673ab7; /* Viền tím Google Form */
-            padding: 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            margin-bottom: 12px;
+            background: #ffffff; border-radius: 8px; border-top: 10px solid #673ab7; 
+            padding: 24px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 12px;
         }
         
         .form-title { font-size: 32px; font-weight: 400; color: #202124; margin: 0 0 12px 0; line-height: 1.2;}
         .form-desc { color: #202124; font-size: 14px; margin-bottom: 20px; line-height: 1.5; white-space: pre-wrap;}
         
-        .account-info-section {
-            border-top: 1px solid #dadce0;
-            padding-top: 15px;
-            font-size: 13px;
-            color: #5f6368;
-        }
+        .account-info-section { border-top: 1px solid #dadce0; padding-top: 15px; font-size: 13px; color: #5f6368; }
         .account-email { font-weight: 600; color: #3c4043; }
         .text-link { color: #1a73e8; text-decoration: none; font-weight: 500; cursor: pointer;}
         .text-link:hover { text-decoration: underline; }
 
-        /* Block câu hỏi tùy chỉnh */
         .question-card {
-            background: #ffffff;
-            border-radius: 8px;
-            padding: 24px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
-            margin-bottom: 12px;
-            transition: 0.2s;
-            border-left: 3px solid transparent;
+            background: #ffffff; border-radius: 8px; padding: 24px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1); margin-bottom: 12px;
+            transition: 0.2s; border-left: 3px solid transparent;
         }
-        .question-card:focus-within {
-            border-left: 3px solid #4285f4;
-        }
+        .question-card:focus-within { border-left: 3px solid #4285f4; }
         
         label { display: block; font-weight: 400; margin-bottom: 16px; color: #202124; font-size: 16px; }
         .required-mark { color: #d93025; margin-left: 4px; }
         
-        /* CSS cho thẻ Input chuẩn Google Form (Kẻ vạch dưới) */
         input[type="text"], input[type="email"], input[type="tel"], textarea { 
-            width: 100%; 
-            padding: 8px 0; 
-            border: none; 
-            border-bottom: 1px solid #dadce0; 
-            box-sizing: border-box; 
-            font-family: inherit; 
-            font-size: 14px; 
-            background-color: transparent;
-            color: #202124;
-            transition: 0.3s;
+            width: 100%; padding: 8px 0; border: none; border-bottom: 1px solid #dadce0; 
+            box-sizing: border-box; font-family: inherit; font-size: 14px; 
+            background-color: transparent; color: #202124; transition: 0.3s;
         }
-        input:focus, textarea:focus { 
-            outline: none; 
-            border-bottom: 2px solid #673ab7;
-        }
+        input:focus, textarea:focus { outline: none; border-bottom: 2px solid #673ab7; }
         
-        /* Dropdown Select */
-        select {
-            width: 50%;
-            padding: 10px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            font-size: 14px;
-            color: #202124;
-            outline: none;
-            background: #fff;
-        }
+        select { width: 50%; padding: 10px; border: 1px solid #dadce0; border-radius: 4px; font-size: 14px; color: #202124; outline: none; background: #fff; }
         select:focus { border: 2px solid #673ab7; padding: 9px;}
         
-        .btn-submit { 
-            background: #673ab7; 
-            color: white; 
-            padding: 10px 24px; 
-            border: none; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 14px; 
-            font-weight: 500; 
-            transition: 0.2s; 
-        }
+        .btn-submit { background: #673ab7; color: white; padding: 10px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 500; transition: 0.2s; }
         .btn-submit:hover { background: #5e35b1; box-shadow: 0 1px 3px rgba(0,0,0,0.2);}
         
-        .btn-clear {
-            background: transparent;
-            border: none;
-            color: #673ab7;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            padding: 10px 16px;
-            border-radius: 4px;
-            transition: 0.2s;
-        }
+        .btn-clear { background: transparent; border: none; color: #673ab7; font-size: 14px; font-weight: 500; cursor: pointer; padding: 10px 16px; border-radius: 4px; transition: 0.2s; }
         .btn-clear:hover { background: #f3e8fd; }
 
-        .text-danger { color: #d93025; font-size: 12px; margin-top: 8px; display: block; display: flex; align-items: center; gap: 4px;}
+        .text-danger { color: #d93025; font-size: 12px; margin-top: 8px; display: flex; align-items: center; gap: 4px;}
         .alert-success { background-color: #e6f4ea; color: #137333; padding: 16px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #ceead6; font-weight: 500; }
         .alert-warning { background-color: #fef7e0; color: #b06000; padding: 16px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #fdd663; font-size: 14px;}
         
-        /* Style riêng cho các thẻ Auto-fill bị khóa */
-        .input-readonly { color: #70757a !important; border-bottom: 1px dashed #dadce0 !important; cursor: not-allowed;}
+        /* CSS CHO KHỐI AUTO-FILL XANH LÁ */
+        .autofill-card { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 24px; margin-bottom: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .autofill-title { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: 600; color: #166534; font-size: 15px;}
+        .autofill-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .autofill-item { display: flex; flex-direction: column; background: #fff; padding: 10px 15px; border-radius: 6px; border: 1px solid #dcfce7;}
+        .autofill-label { font-size: 11px; color: #15803d; margin-bottom: 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+        .autofill-value { margin: 0; font-size: 15px; color: #14532d; font-weight: 500; }
     </style>
 </head>
 <body>
+
+@php
+    // HACK CHO VIỆC TEST: Tự động lấy User đầu tiên trong DB nếu chưa đăng nhập
+    $testUser = auth()->user() ?? \App\Models\User::first();
+@endphp
 
 <div class="form-container">
     @if(session('success'))
@@ -146,9 +95,9 @@
             @endif
             
             <div class="account-info-section">
-                @auth
+                @if($testUser)
                     <div>
-                        <span class="account-email">{{ auth()->user()->display_name }} ({{ auth()->user()->email }})</span>
+                        <span class="account-email">{{ $testUser->display_name }} ({{ $testUser->email }})</span>
                         <a href="#" class="text-link" style="margin-left: 5px;">Chuyển đổi tài khoản</a>
                     </div>
                     <div style="margin-top: 8px;">
@@ -158,27 +107,34 @@
                         * Biểu thị câu hỏi bắt buộc
                     </div>
                 @else
-                    <span style="color: #d93025; font-weight: 500;">⚠️ Bạn đang ở chế độ Khách. Vui lòng đăng nhập để hệ thống tự động điền thông tin và lưu điểm rèn luyện!</span>
-                @endauth
+                    <span style="color: #d93025; font-weight: 500;">⚠️ Bạn đang ở chế độ Khách. Vui lòng chạy lệnh db:seed để tạo dữ liệu test!</span>
+                @endif
             </div>
         </div>
 
-        @auth
-            <div class="question-card">
-                <label>Email trường <span class="required-mark">*</span></label>
-                <input type="text" value="{{ auth()->user()->email }}" class="input-readonly" readonly>
+        @if($testUser)
+            <div class="autofill-card">
+                <div class="autofill-title">
+                    <span><i class="fa-solid fa-shield-halved"></i> Thông tin Sinh viên (Tự động đính kèm)</span>
+                    <span style="color: #10b981; font-weight: 400; font-size: 13px;"><i class="fa-solid fa-check"></i> Đã xác thực</span>
+                </div>
+                <div class="autofill-grid">
+                    <div class="autofill-item">
+                        <span class="autofill-label">Họ và tên hiển thị</span>
+                        <p class="autofill-value">{{ $testUser->display_name }}</p>
+                    </div>
+                    <div class="autofill-item">
+                        <span class="autofill-label">Mã Sinh viên</span>
+                        <p class="autofill-value">{{ $testUser->student_code ?? 'Chưa cập nhật' }}</p>
+                    </div>
+                    <div class="autofill-item" style="grid-column: span 2;">
+                        <span class="autofill-label">Email trường</span>
+                        <p class="autofill-value">{{ $testUser->email }}</p>
+                    </div>
+                </div>
+                <p style="margin: 15px 0 0 0; font-size: 12px; color: #166534; font-style: italic;">* Hệ thống tự động trích xuất thông tin từ tài khoản để đảm bảo tính minh bạch và cộng điểm rèn luyện.</p>
             </div>
-            
-            <div class="question-card">
-                <label>Họ và tên hiển thị <span class="required-mark">*</span></label>
-                <input type="text" value="{{ auth()->user()->display_name }}" class="input-readonly" readonly>
-            </div>
-
-            <div class="question-card">
-                <label>Mã sinh viên <span class="required-mark">*</span></label>
-                <input type="text" value="{{ auth()->user()->student_code }}" class="input-readonly" readonly>
-            </div>
-        @endauth
+        @endif
 
         @foreach($form->fields as $field)
             @php $fieldName = 'field_' . $field->id; @endphp

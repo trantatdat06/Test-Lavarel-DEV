@@ -157,13 +157,22 @@
         <div class="action-bar">
             @if($testUser)
                 @if($isGoing)
-                    <form action="{{ route('events.join', $event->id) }}" method="POST">
-                        @csrf
-                        <input type="hidden" name="status" value="not_going">
-                        <button type="submit" class="btn btn-active" title="Bấm để hủy đăng ký" onclick="return confirm('Bạn có chắc chắn muốn hủy đăng ký tham gia sự kiện này?')">
-                            <i class="fa-solid fa-circle-check"></i> Đã đăng ký
-                        </button>
-                    </form>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <form action="{{ route('events.join', $event->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="status" value="not_going">
+                            <button type="submit" class="btn btn-active" title="Bấm để hủy đăng ký" onclick="return confirm('Bạn có chắc chắn muốn hủy đăng ký tham gia sự kiện này?')">
+                                <i class="fa-solid fa-circle-check"></i> Đã đăng ký
+                            </button>
+                        </form>
+
+                        @if($event->forms && $event->forms->count() > 0)
+                            @php $proofForm = $event->forms->first(); @endphp
+                            <a href="{{ route('forms.show', $proofForm->id) }}" class="btn" style="background: #673ab7; color: white;">
+                                <i class="fa-solid fa-file-arrow-up"></i> Nộp minh chứng
+                            </a>
+                        @endif
+                    </div>
                 @else
                     <form action="{{ route('events.join', $event->id) }}" method="POST">
                         @csrf
@@ -175,7 +184,7 @@
                 @endif
             @else
                 <div style="color: #d93025; font-size: 14px; font-weight: 500;">
-                    <i class="fa-solid fa-triangle-exclamation"></i> Không tìm thấy User nào trong Database để test! Hãy chạy php artisan db:seed
+                    <i class="fa-solid fa-triangle-exclamation"></i> Không tìm thấy User nào trong Database!
                 </div>
             @endif
         </div>

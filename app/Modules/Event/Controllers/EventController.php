@@ -65,32 +65,51 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'title'              => ['required', 'string', 'max:300'],
-            'description'        => ['nullable', 'string'],
-            'location'           => ['nullable', 'string', 'max:500'],
-            'page_id'            => ['nullable', 'exists:pages,id'],
-            'start_time'         => ['required', 'date'], 
-            'end_time'           => ['required', 'date', 'after:start_time'],
-            'point_amount'       => ['nullable', 'integer', 'min:0'],
-            'point_category'     => ['nullable', 'string'],
+            'title'         => ['required', 'string', 'max:300'],
+            'description'   => ['nullable', 'string'],
+            'location'      => ['nullable', 'string', 'max:500'],
+            'page_id'       => ['nullable', 'exists:pages,id'],
+            'start_time'    => ['required', 'date'], 
+            'end_time'      => ['required', 'date', 'after:start_time'],
+            'point_amount'  => ['nullable', 'integer', 'min:0'],
+            'point_category'=> ['nullable', 'string'],
+        ], [
+            'title.required' => 'Vui lòng nhập tên sự kiện.',
+            'start_time.required' => 'Vui lòng chọn thời gian bắt đầu.',
+            'end_time.after' => 'Thời gian kết thúc phải sau thời gian bắt đầu!',
         ]);
 
-        // Xử lý Checkbox bật/tắt điểm rèn luyện
+        // Xử lý điểm rèn luyện
         $data['has_training_point'] = $request->has('has_training_point');
         if (!$data['has_training_point']) {
             $data['point_amount'] = 0;
             $data['point_category'] = null;
         }
 
-        // Nếu người tạo không truyền page_id (tạo bằng tài khoản cá nhân), tạm gán vào page 1 để test
-        if (empty($data['page_id'])) {
-            $data['page_id'] = 1; 
+        if (empty($data['page_id'])) { $data['page_id'] = 1; }
+
+        // 1. TẠO SỰ KIỆN VÀO DATABASE
+        $event = \App\Models\Event::create($data);
+
+        // 2. TỰ ĐỘNG TẠO FORM MINH CHỨNG (Nếu Admin đánh dấu check)
+        if ($request->has('auto_create_form')) {
+            $form = \App\Models\Form::create([
+                'event_id' => $event->id, // Tự động móc nối với ID sự kiện vừa tạo
+                'title' => 'Nộp minh chứng: ' . $event->title,
+                'description' => 'Vui lòng tải ảnh/file minh chứng tham gia sự kiện của bạn lên đây để hệ thống ghi nhận và cộng điểm rèn luyện.',
+            ]);
+
+            // Tự động đẻ ra 1 câu hỏi yêu cầu upload file minh chứng
+            $form->fields()->create([
+                'label' => 'Tải ảnh/file minh chứng của bạn lên',
+                'type' => 'file',
+                'required' => true,
+                'order' => 1
+            ]);
         }
 
-        $event = Event::create($data);
-
         return redirect()->route('events.show', $event)
-                         ->with('success', 'Sự kiện đã được tạo thành công! Bạn có thể copy link này để chia sẻ.');
+                         ->with('success', 'Tuyệt vời! Sự kiện đã được tạo thành công.');
     }
 
     /**
