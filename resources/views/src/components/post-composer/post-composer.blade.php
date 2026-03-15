@@ -142,21 +142,13 @@
             </div>
 
             <div class="addon-section" style="margin-bottom: 0;">
-                <div class="addon-title"><i class="fa-solid fa-tags"></i> Phân loại & Liên kết ngoài</div>
-                <input type="url" name="external_link" class="form-control" placeholder="Dán link web, link báo vào đây (nếu có)..." style="margin-bottom: 10px;">
+                <div class="addon-title"><i class="fa-solid fa-tags"></i> Sự kiện/Form</div>
+                <input type="url" name="external_link" class="form-control" placeholder="Dán link sự kiện/form vào đây (nếu có)..." style="margin-bottom: 10px;">
                 <select name="tags[]" class="form-control" multiple size="3">
                     <option value="hoc_bong">🎓 Học bổng</option>
                     <option value="su_kien">🎉 Sự kiện</option>
                     <option value="cuoc_thi">🏆 Cuộc thi</option>
                 </select>
-            </div>
-            
-            <div class="add-to-post-toolbar" style="margin-top: 15px;">
-                <span>Gắn vào bài viết</span>
-                <div class="addon-buttons">
-                    <button type="button" id="btn_toggle_event" class="addon-btn" onclick="toggleAddon('event', true)"><i class="fa-regular fa-calendar" style="color: #dc2626;"></i> Sự kiện</button>
-                    <button type="button" id="btn_toggle_form" class="addon-btn" onclick="toggleAddon('form', true)"><i class="fa-solid fa-list-check" style="color: #166534;"></i> Biểu mẫu</button>
-                </div>
             </div>
             
         </div>
