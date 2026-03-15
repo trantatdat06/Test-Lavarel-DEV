@@ -4,9 +4,12 @@ namespace App\Modules\Post\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Post;
+use App\Models\Event;
+use App\Models\Form;
 use App\Modules\Post\Requests\StorePostRequest;
 use App\Modules\Post\Services\PostService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -14,28 +17,68 @@ class PostController extends Controller
     public function __construct(private PostService $postService) {}
 
     /**
-     * XỬ LÝ ĐĂNG BÀI VIẾT MỚI
+     * XỬ LÝ ĐĂNG BÀI VIẾT MỚI (Tích hợp đính kèm Sự kiện & Biểu mẫu)
      */
     public function store(StorePostRequest $request)
     {
-        // 1. Lấy toàn bộ dữ liệu đã được kiểm duyệt (bao gồm nội dung, link form...)
+        // 1. Lấy dữ liệu cơ bản của bài viết đã được kiểm duyệt trong StorePostRequest
         $data = $request->validated();
 
-        // 2. Xử lý file đính kèm (Ảnh/Video) nếu có
-        // Lưu ý: Ở file giao diện HTML, thẻ input upload file phải đặt name="media"
+        // 2. Validate bổ sung trực tiếp cho các trường Đính kèm (Luồng 2)
+        $request->validate([
+            'has_event'           => 'nullable|in:0,1',
+            'attached_event_id'   => 'required_if:has_event,1|nullable|exists:events,id',
+            'has_form'            => 'nullable|in:0,1',
+            'attached_form_id'    => 'required_if:has_form,1|nullable|exists:forms,id',
+        ], [
+            'attached_event_id.required_if' => 'Vui lòng chọn một Sự kiện từ danh sách để đính kèm.',
+            'attached_event_id.exists'      => 'Sự kiện này không tồn tại hoặc đã bị xóa.',
+            'attached_form_id.required_if'  => 'Vui lòng chọn một Biểu mẫu từ danh sách để đính kèm.',
+            'attached_form_id.exists'       => 'Biểu mẫu này không tồn tại hoặc đã bị xóa.',
+        ]);
+
+        // 3. Xử lý file đính kèm (Ảnh/Video)
         if ($request->hasFile('media')) {
-            // Lưu file vào thư mục 'posts' trong ổ cứng và lấy đường dẫn lưu vào database
-            $data['media_path'] = $request->file('media')->store('posts', 'public');
+            $data['media_path'] = $request->file('media')->store('posts/media', 'public');
         }
 
-        // 3. XỬ LÝ LỖI Ở ĐÂY: Lấy User đang đăng nhập, NẾU CHƯA CÓ thì lấy tạm User đầu tiên trong Database
+        // Lấy User đang đăng nhập (hoặc User mặc định nếu đang test)
         $user = $request->user() ?? \App\Models\User::first();
 
-        // 4. Gọi PostService để tạo bài viết (Gắn kèm ID của người dùng ở bước 3)
-        $post = $this->postService->create($user, $data);
+        // Sử dụng Transaction để đảm bảo tính toàn vẹn dữ liệu
+        try {
+            DB::beginTransaction();
 
-        // 5. Trả về trang cũ kèm thông báo
-        return redirect()->back()->with('success', 'Bài viết đã được đăng thành công!');
+            // 4. Gọi PostService để tạo bài viết (Giữ nguyên luồng chuẩn của bạn)
+            $post = $this->postService->create($user, $data);
+
+            // 5. MÓC NỐI SỰ KIỆN: Nếu Admin bật "has_event" và có chọn ID Sự kiện
+            if ($request->input('has_event') == '1' && $request->filled('attached_event_id')) {
+                $event = Event::find($request->input('attached_event_id'));
+                if ($event) {
+                    $event->post_id = $post->id; // Gắn ID bài viết vào Sự kiện
+                    $event->save();
+                }
+            }
+
+            // 6. MÓC NỐI BIỂU MẪU: Nếu Admin bật "has_form" và có chọn ID Biểu mẫu
+            if ($request->input('has_form') == '1' && $request->filled('attached_form_id')) {
+                $form = Form::find($request->input('attached_form_id'));
+                if ($form) {
+                    $form->post_id = $post->id; // Gắn ID bài viết vào Form
+                    $form->save();
+                }
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Bài viết đã được đăng thành công kèm theo biểu mẫu/sự kiện!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()
+                ->withErrors(['error' => 'Lỗi hệ thống không thể đăng bài: ' . $e->getMessage()])
+                ->withInput();
+        }
     }
 
     /**
@@ -43,10 +86,8 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        // Kiểm tra xem User này có quyền xem bài viết không (ví dụ bài riêng tư thì không cho xem)
         $this->authorize('view', $post);
         
-        // Tải kèm các thông tin liên quan để hiển thị (Người đăng, Trang, Bài gốc nếu là share, Bình luận...)
         $post->load(['author', 'page', 'originalPost.author', 'comments.author', 'likes']);
 
         return view('post.show', compact('post'));
@@ -57,10 +98,8 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        // Chỉ tác giả bài viết hoặc Admin mới có quyền sửa
         $this->authorize('update', $post);
 
-        // Lấy các trường cho phép sửa (đã bổ sung thêm external_link để có thể sửa link form)
         $post->update($request->only(['title', 'content', 'visibility', 'tags', 'external_link']));
 
         return redirect()->back()->with('success', 'Đã cập nhật bài viết thành công.');
@@ -71,10 +110,8 @@ class PostController extends Controller
      */
     public function destroy(Post $post)
     {
-        // Kiểm tra quyền xóa
         $this->authorize('delete', $post);
         
-        // Gọi Service thực hiện xóa
         $this->postService->delete($post);
 
         return redirect()->back()->with('success', 'Đã xóa bài viết.');
@@ -87,10 +124,8 @@ class PostController extends Controller
     {
         $this->authorize('view', $post);
         
-        // Gọi Service xử lý logic thả tim
         $result = $this->postService->toggleLike(auth()->user(), $post);
 
-        // Trả về JSON để giao diện Frontend tự đổi màu nút Like mà không cần tải lại trang web
         return response()->json($result);
     }
 
@@ -111,14 +146,12 @@ class PostController extends Controller
      */
     public function repost(Post $post)
     {
-        // Kiểm tra quyền share
         $this->authorize('repost', $post);
 
-        // Gọi Service tạo bài viết mới, trỏ parent_post_id về ID của bài viết gốc
         $repost = $this->postService->create(auth()->user(), [
             'parent_post_id' => $post->id,
-            'content' => request('content'), // Nội dung cap mà người share gõ thêm
-            'visibility' => request('visibility', 'public'), // Quyền riêng tư của bài share
+            'content' => request('content'), 
+            'visibility' => request('visibility', 'public'), 
         ]);
 
         return redirect()->back()->with('success', 'Đã chia sẻ bài viết thành công!');
