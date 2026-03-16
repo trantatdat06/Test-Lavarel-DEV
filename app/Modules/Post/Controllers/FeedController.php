@@ -5,6 +5,7 @@ namespace App\Modules\Post\Controllers;
 use App\Http\Controllers\Controller;
 use App\Modules\Post\Services\PostService;
 use Illuminate\Http\Request;
+use App\Models\Tag;
 
 class FeedController extends Controller
 {
@@ -15,7 +16,8 @@ class FeedController extends Controller
         $user          = $request->user();
         $posts         = $this->postService->getFeedForUser($user);
         $followedPages = $user->followedPages()->withCount('followers')->latest()->get();
+        $availableTags = Tag::all();
 
-        return view('pages.dashboard', compact('posts', 'followedPages'));
+        return view('pages.dashboard', compact('posts', 'followedPages', 'availableTags'));
     }
 }

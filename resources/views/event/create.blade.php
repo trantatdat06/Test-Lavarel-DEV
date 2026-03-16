@@ -148,31 +148,6 @@
                 @error('description') <span class="text-danger">{{ $message }}</span> @enderror
             </div>
 
-            <div class="form-group">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; color: #111827;">
-                    <input type="checkbox" name="has_training_point" id="toggle_points" style="width: 18px; height: 18px;" onchange="togglePointConfig()">
-                    <span><i class="fa-solid fa-star" style="color: #eab308;"></i> Sự kiện này có cấp Điểm rèn luyện</span>
-                </label>
-
-                <div id="point_config_area" style="display: none; margin-top: 15px;">
-                    <div class="grid-2-cols">
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Số điểm cấp</label>
-                            <input type="number" name="point_amount" class="form-control" placeholder="VD: 5" min="1">
-                        </div>
-                        <div class="form-group" style="margin-bottom: 0;">
-                            <label>Tiêu chí rèn luyện</label>
-                            <select name="point_category" class="form-control">
-                                <option value="Học thuật & NCKH">Tiêu chí 1: Học thuật & NCKH</option>
-                                <option value="Chấp hành Nội quy">Tiêu chí 2: Chấp hành Nội quy</option>
-                                <option value="Tình nguyện & Xã hội">Tiêu chí 3: Tình nguyện & Xã hội</option>
-                                <option value="Văn hóa & Thể thao">Tiêu chí 3: Văn hóa & Thể thao</option>
-                                <option value="Kỹ năng mềm">Tiêu chí 4: Kỹ năng mềm</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <script>
                 function togglePointConfig() {
@@ -181,15 +156,45 @@
                 }
             </script>
 
-            <div style="background: #eef2ff; border: 1px solid #c7d2fe; padding: 20px; border-radius: 8px; margin-bottom: 22px;">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: 600; color: #3730a3;">
-                    <input type="checkbox" name="auto_create_form" checked style="width: 18px; height: 18px;">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Tự động tạo Form nộp minh chứng
+            <div style="background: #f8f9fa; border: 1px solid #e4e6eb; padding: 20px; border-radius: 8px; margin-bottom: 22px;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 15px; font-weight: 600; color: #1c1e21;">
+                    <input type="checkbox" name="auto_create_form" id="auto_create_form" checked style="width: 18px; height: 18px;" onchange="toggleFormTags()">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: #1877f2;"></i> Tự động tạo Form nộp minh chứng
                 </label>
-                <div style="font-size: 13px; color: #4f46e5; margin-top: 8px; margin-left: 28px;">
+                <div style="font-size: 13px; color: #65676b; margin-top: 8px; margin-left: 28px;">
                     Hệ thống sẽ tự động sinh ra một biểu mẫu yêu cầu sinh viên tải ảnh minh chứng đính kèm với sự kiện này.
                 </div>
+
+                <div id="form_tags_area" style="margin-top: 15px; margin-left: 28px;">
+                    <label style="font-size: 14px; font-weight: 600; color: #1c1e21; margin-bottom: 8px; display: block;">
+                        <i class="fa-solid fa-tags" style="color: #65676b;"></i> Chọn chủ đề (Tags) cho Form này:
+                    </label>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">
+                        @if(isset($availableTags) && count($availableTags) > 0)
+                            @foreach($availableTags as $tag)
+                                <input type="checkbox" name="form_tags[]" id="event_form_tag_{{ $tag->id }}" value="{{ $tag->name }}" class="event-form-tag-checkbox" style="display: none;">
+                                
+                                <label for="event_form_tag_{{ $tag->id }}" class="event-form-tag-label" style="padding: 6px 14px; background-color: #ffffff; color: #65676b; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid #ced4da; transition: all 0.2s ease; user-select: none;">
+                                    #{{ $tag->name }}
+                                </label>
+                            @endforeach
+                        @else
+                            <p style="font-size: 13px; color: #65676b; font-style: italic;">Chưa có chủ đề nào trong hệ thống</p>
+                        @endif
+                    </div>
+                </div>
             </div>
+
+            <script>
+                function toggleFormTags() {
+                    const isChecked = document.getElementById('auto_create_form').checked;
+                    document.getElementById('form_tags_area').style.display = isChecked ? 'block' : 'none';
+                }
+                document.addEventListener("DOMContentLoaded", function() {
+                    toggleFormTags();
+                });
+            </script>
 
             <button type="submit" class="btn-submit"><i class="fa-solid fa-calendar-plus"></i> Tạo sự kiện</button>
         </form>
@@ -198,3 +203,13 @@
 
 </body>
 </html>
+
+<style>
+    /* Đổi màu nút tag khi được chọn */
+    .event-form-tag-checkbox:checked + .event-form-tag-label {
+        background-color: #e7f3ff !important;
+        color: #1877f2 !important;
+        border-color: #1877f2 !important;
+        font-weight: 500;
+    }
+</style>

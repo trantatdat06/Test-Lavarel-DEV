@@ -34,13 +34,20 @@ class FormController extends Controller
             'fields.*.type' => 'required|in:text,textarea,select,radio,checkbox,date,file,email,phone',
             'fields.*.required' => 'boolean',
             'fields.*.options' => 'nullable|array',
+            'start_time'  => 'nullable|date',
+            'end_time'    => 'nullable|date|after_or_equal:start_time',
+            'tags'        => 'nullable|array',
+            'tags.*'      => 'string|exists:tags,name'
         ]);
 
-        $form = DB::transaction(function () use ($validated) {
+        $form = DB::transaction(function () use ($validated, $request) {
             $newForm = Form::create([
                 'event_id' => $validated['event_id'] ?? null,
                 'title' => $validated['title'],
                 'description' => $validated['description'],
+                'start_time'  => $validated['start_time'] ?? null, 
+                'end_time'    => $validated['end_time'] ?? null,
+                'tags'        => $request->input('tags', []),
             ]);
 
             foreach ($validated['fields'] as $index => $fieldData) {
@@ -120,6 +127,19 @@ class FormController extends Controller
         // --- BẮT ĐẦU ĐOẠN HACK TEST CHO AUTO-FILL ---
         $testUser = $request->user() ?? \App\Models\User::first();
 
+        // GHI ĐÈ LẠI DỮ LIỆU ĐÃ MAP TỪ PROFILE USER
+        foreach ($form->fields as $field) {
+            $fieldName = 'field_' . $field->id;
+            
+            if ($field->mapping_key === 'student_code') {
+                $validatedData[$fieldName] = $testUser->student_code;
+            } elseif ($field->mapping_key === 'full_name') {
+                $validatedData[$fieldName] = $testUser->display_name;
+            } elseif ($field->mapping_key === 'email') {
+                $validatedData[$fieldName] = $testUser->email;
+            }
+        }
+
         FormSubmission::create([
             'form_id'      => $form->id,
             'user_id'      => $testUser ? $testUser->id : null, 
@@ -154,6 +174,16 @@ class FormController extends Controller
         $submission->update([
             'status' => $validated['status'],
             'note'   => $validated['note'] ?? $submission->note,
+        ]);
+
+        $message = $validated['status'] == 'approved' 
+                   ? "Đơn đăng ký của bạn đã được duyệt." 
+                   : "Đơn của bạn bị từ chối với lý do: " . ($validated['note'] ?? 'Không có');
+
+        \App\Models\Notification::create([
+            'user_id' => $submission->user_id,
+            'content' => $message,
+            'type'    => 'FORM_STATUS_UPDATE'
         ]);
 
         return back()->with('success', 'Đã cập nhật trạng thái đơn thành công!');

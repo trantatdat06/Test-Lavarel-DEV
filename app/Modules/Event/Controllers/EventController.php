@@ -73,6 +73,8 @@ class EventController extends Controller
             'end_time'      => ['required', 'date', 'after:start_time'],
             'point_amount'  => ['nullable', 'integer', 'min:0'],
             'point_category'=> ['nullable', 'string'],
+            'form_tags'     => ['nullable', 'array'],
+            'form_tags.*'   => ['string', 'exists:tags,name'],
         ], [
             'title.required' => 'Vui lòng nhập tên sự kiện.',
             'start_time.required' => 'Vui lòng chọn thời gian bắt đầu.',
@@ -97,6 +99,7 @@ class EventController extends Controller
                 'event_id' => $event->id, // Tự động móc nối với ID sự kiện vừa tạo
                 'title' => 'Nộp minh chứng: ' . $event->title,
                 'description' => 'Vui lòng tải ảnh/file minh chứng tham gia sự kiện của bạn lên đây để hệ thống ghi nhận và cộng điểm rèn luyện.',
+                'tags' => $request->input('form_tags', []),
             ]);
 
             // Tự động đẻ ra 1 câu hỏi yêu cầu upload file minh chứng

@@ -9,9 +9,9 @@ class Form extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['event_id', 'title', 'description', 'is_active'];
+    protected $fillable = ['event_id', 'title', 'description', 'is_active', 'post_id', 'start_time', 'end_time', 'tags'];
 
-    protected $casts = ['is_active' => 'boolean'];
+    protected $casts = ['is_active' => 'boolean', 'tags' => 'array'];
 
     public function event()       { return $this->belongsTo(Event::class); }
     public function fields()      { return $this->hasMany(FormField::class)->orderBy('order'); }

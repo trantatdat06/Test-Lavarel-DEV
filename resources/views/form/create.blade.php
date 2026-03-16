@@ -130,14 +130,34 @@
                     <input type="datetime-local" name="deadline" class="form-control">
                 </div>
 
-                <div class="form-group">
-                    <label>Hình ảnh Cover (Tùy chọn)</label>
-                    <label class="upload-zone" for="cover_upload">
-                        <i class="fa-solid fa-cloud-arrow-up"></i>
-                        <p>Nhấn để tải ảnh lên<br><span style="font-size: 11px; font-weight: normal;">(PNG, JPG, max 5MB)</span></p>
-                    </label>
-                    <input type="file" id="cover_upload" name="cover_image" style="display: none;" accept="image/*">
+                <div class="mb-4">
+                    <label class="form-label fw-bold"><i class="fa-solid fa-tags"></i> Chủ đề biểu mẫu (Tags)</label>
+                    <p style="font-size: 12px; color: #65676b; margin-bottom: 8px;">Nhấn vào các thẻ bên dưới để gắn tag cho Form</p>
+                    
+                    <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        @if(isset($availableTags) && count($availableTags) > 0)
+                            @foreach($availableTags as $tag)
+                                <input type="checkbox" name="tags[]" id="form_tag_{{ $tag->id }}" value="{{ $tag->name }}" class="form-tag-checkbox" style="display: none;">
+                                
+                                <label for="form_tag_{{ $tag->id }}" class="form-tag-label" style="padding: 6px 14px; background-color: #f0f2f5; color: #65676b; border-radius: 20px; font-size: 13px; cursor: pointer; border: 1px solid transparent; transition: all 0.2s ease; user-select: none;">
+                                    #{{ $tag->name }}
+                                </label>
+                            @endforeach
+                        @else
+                            <p class="text-muted small">Chưa có chủ đề nào trong hệ thống</p>
+                        @endif
+                    </div>
                 </div>
+
+                <style>
+                    .form-tag-checkbox:checked + .form-tag-label {
+                        background-color: #e7f3ff !important;
+                        color: #1877f2 !important;
+                        border-color: #1877f2 !important;
+                        font-weight: 500;
+                    }
+                </style>
+
             </div>
         </div>
 

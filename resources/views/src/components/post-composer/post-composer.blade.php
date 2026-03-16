@@ -53,6 +53,14 @@
     
     .animate-slide-down { animation: slideDownModal 0.2s ease-out forwards; }
     @keyframes slideDownModal { from { transform: translateY(-30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    /* CSS cho Tag chọn tự do */
+    .tag-selector { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; margin-bottom: 15px; }
+    .tag-checkbox { display: none; /* Ẩn ô vuông checkbox mặc định đi */}
+    .tag-label { display: inline-block; padding: 6px 14px; background-color: #f0f2f5; color: #65676b; border-radius: 20px; font-size: 13px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; user-select: none; /* Ngăn bôi đen text khi click nhầm */}
+    .tag-label:hover {background-color: #e4e6eb; }
+    /* Đổi màu xanh kh i người dùng bấm chọn (checked) */
+    .tag-checkbox:checked + .tag-label {background-color: #e7f3ff; color: #1877f2; border-color: #1877f2; font-weight: 500; }
 </style>
 
 <div class="composer-wrapper">
@@ -142,13 +150,22 @@
             </div>
 
             <div class="addon-section" style="margin-bottom: 0;">
-                <div class="addon-title"><i class="fa-solid fa-tags"></i> Sự kiện/Form</div>
+                <div class="addon-title"><i class="fa-solid fa-tags"></i> Chủ đề bài viết (Tags)</div>
+                <p style="font-size: 12px; color: #65676b; margin-top: 4px; margin-bottom: 8px;">Nhấn vào các thẻ bên dưới để chọn (hoặc bỏ chọn) chủ đề</p>
+                
+                <div class="tag-selector">
+                    @if(isset($availableTags) && count($availableTags) > 0)
+                        @foreach($availableTags as $tag)
+                            <input type="checkbox" name="tags[]" id="tag_{{ $tag->id }}" value="{{ $tag->name }}" class="tag-checkbox">
+                            <label for="tag_{{ $tag->id }}" class="tag-label">#{{ $tag->name }}</label>
+                        @endforeach
+                    @else
+                        <p style="font-size: 13px; color: #65676b; font-style: italic;">Chưa có chủ đề nào trong hệ thống</p>
+                    @endif
+                </div>
+
+                <div class="addon-title" style="margin-top: 15px;"><i class="fa-solid fa-link"></i> Link sự kiện/form đính kèm</div>
                 <input type="url" name="external_link" class="form-control" placeholder="Dán link sự kiện/form vào đây (nếu có)..." style="margin-bottom: 10px;">
-                <select name="tags[]" class="form-control" multiple size="3">
-                    <option value="hoc_bong">🎓 Học bổng</option>
-                    <option value="su_kien">🎉 Sự kiện</option>
-                    <option value="cuoc_thi">🏆 Cuộc thi</option>
-                </select>
             </div>
             
         </div>

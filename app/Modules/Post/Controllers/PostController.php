@@ -148,6 +148,13 @@ class PostController extends Controller
     {
         $this->authorize('repost', $post);
 
+        $newVisibility = request('visibility', 'public');
+
+        // Chặn logic Public share Private
+        if ($post->visibility === 'private' && $newVisibility === 'public') {
+            return back()->withErrors(['error' => 'Không được phép chia sẻ công khai một bài viết nội bộ.']);
+        }
+
         $repost = $this->postService->create(auth()->user(), [
             'parent_post_id' => $post->id,
             'content' => request('content'), 
