@@ -2,56 +2,27 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\AdminController;
 
-// 1. Route chính mở trang chủ
-Route::get('/', function () {
-    return view('index');
-});
+Route::get('/', function () { return view('index'); });
 
-// 2. Route xử lý việc tải các file giao diện động (Tabs)
+// Route cho AJAX Tabs
 Route::get('/src/{path}', function ($path) {
-    $viewPath = str_replace('.blade.php', '', $path);
-    $viewName = 'src.' . str_replace('/', '.', $viewPath);
-    if (view()->exists($viewName)) {
-        return view($viewName);
-    }
-    return abort(404);
-})->where('path', '.*'); 
+    $viewName = 'src.' . str_replace(['/', '.blade.php'], ['.', ''], $path);
+    return view()->exists($viewName) ? view($viewName) : abort(404);
+})->where('path', '.*');
 
-// 3. Route trang Đăng nhập / Đăng ký
-Route::get('/auth', function () {
-    return view('page.auth.auth'); 
-});
+// Route Auth
+Route::get('/auth', function () { return view('page.auth.auth'); });
 
-// ==========================================
-// CÁC ROUTE XỬ LÝ PROFILE CÁ NHÂN (HỒ SƠ)
-// ==========================================
-
-// Lấy dữ liệu profile
+// PROFILE ROUTES
 Route::get('/profile/{studentCode}', [ProfileController::class, 'show']);
-
-// Cập nhật thông tin hồ sơ
-Route::put('/profile/{studentCode}', [ProfileController::class, 'update']);
-
-// Upload Ảnh Avatar và Cover
-Route::post('/profile/{studentCode}/upload-image', [ProfileController::class, 'uploadImage']);
-
-// Nộp minh chứng cho sự kiện
-Route::post('/profile/{studentCode}/events/{eventId}/proof', [ProfileController::class, 'submitProof']);
-
-// Tạo lịch cá nhân / To-do
-Route::post('/profile/{studentCode}/tasks', [ProfileController::class, 'createTask']);
-// Route chuyên dụng để load nội dung từng Tab trong Profile
 Route::get('/profile/{studentCode}/tab/{tabName}', [ProfileController::class, 'getTab']);
-// Route để thay đổi trạng thái hoàn thành của task
-Route::post('/profile/{studentCode}/tasks/{id}/toggle', [ProfileController::class, 'toggleTask']);
-// Route xóa lịch trình
-Route::delete('/profile/{studentCode}/tasks/{id}', [ProfileController::class, 'deleteTask']);
-// Route nộp minh chứng (dùng cho cả Sự kiện và Lịch học bổ sung)
-Route::post('/profile/{studentCode}/submit-proof/{type}/{id}', [ProfileController::class, 'submitProof']);
-Route::post('/profile/{studentCode}/tasks/{taskId}/proof-gps', [\App\Http\Controllers\ProfileController::class, 'submitTaskProofGps']);
-Route::post('/profile/{studentCode}/classes', [\App\Http\Controllers\ProfileController::class, 'createClass']);
-Route::delete('/profile/{studentCode}/classes/{id}', [\App\Http\Controllers\ProfileController::class, 'deleteClass']);
+Route::post('/profile/{studentCode}/request-page', [ProfileController::class, 'submitPageRequest']);
 
-// Route gửi yêu cầu tạo Page mới
-Route::post('/profile/{studentCode}/request-page', [\App\Http\Controllers\ProfileController::class, 'submitPageRequest']);
+// ADMIN ROUTES (Tạm bỏ middleware để test)
+Route::prefix('admin')->group(function () {
+    Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::post('/page/{id}/approve', [AdminController::class, 'approvePage'])->name('admin.page.approve');
+    Route::post('/page/{id}/reject', [AdminController::class, 'rejectPage'])->name('admin.page.reject');
+});
